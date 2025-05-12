@@ -10,8 +10,8 @@ export const useAuthStore = create ((set) => ({
     setUser: (user) => set({ user }),
 
     // Optional: logout the user
-    logout: () => {
-        localStorage.removeItem('user')
+    logout: async () => {
+        await logoutUser()
         set({ user: null })
     },
 }))

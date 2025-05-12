@@ -1,6 +1,6 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import Login from './components/Login'
 import ProtectedRoute from './components/ProtectedRoute'
+import AuthForm from './components/AuthForm'
 import Dashboard from './pages/Dashboard'
 import AddBudget from './components/AddBudget'
 import BudgetList from './components/BudgetList'
@@ -25,7 +25,7 @@ function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/login" element={<Login />} />
+                <Route path="/login" element={<AuthForm />} />
                 <Route
                     path="/dashboard"
                     element={
@@ -38,15 +38,7 @@ function App() {
                         </ProtectedRoute>
                     }
                 />
-                <Route
-                    path='/dashboard'
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route path="*" element={<Login />} />
+                <Route path="*" element={<AuthForm />} />
 
             </Routes>
         </Router>

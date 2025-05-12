@@ -5,13 +5,17 @@ This is a basic budgeting app so that users can plan and track their finances!
 
 === Product Backlog ===
 Authentication & User Access
-    - As a user, I want to create an account.
-        > Create a login page.
+    - DONE | As a user, I want to create an account.
         > Create an account registration page.
+        > Make registration accessible from the login page.
         > Develop backend logic for account registration.
-    - As a user, I want to login to my account and access my data.
+    - WIP | As a user, I want to login to my account and access my data.
+        > Create a login page.
         > Develop backend logic for login.
-    - As a user, I want to log out so that others cannot access my data.
+    - DONE | As a user, I want to log out so that others cannot access my data.
+        > Create logout option
+        > Develop backend logic for logout
+    - DONE | As a developer, I want to prevent users from creating multiple accounts for the same email address.
 Dashboard Summary
     - As a user, I want to view a summary dashboard.
         > Create a user dashboard.
