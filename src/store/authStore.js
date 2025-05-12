@@ -1,14 +1,15 @@
 import { create } from 'zustand'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth } from '../firebase'
+import { logoutUser } from '../services/authService'
 
 export const useAuthStore = create ((set) => ({
-    user: JSON.parse(localStorage.getItem('user')) || null,
+    user: null,
 
-    login: (username) => {
-        const user = { username }
-        localStorage.setItem('user', JSON.stringify(user))
-        set({ user })
-    },
+    // Called when Firebase updates auth state
+    setUser: (user) => set({ user }),
 
+    // Optional: logout the user
     logout: () => {
         localStorage.removeItem('user')
         set({ user: null })
