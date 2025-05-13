@@ -1,4 +1,4 @@
-import { useBudgetStore } from '../store/budgetStore'
+import { useBudgetStore } from '../../store/budgetStore'
 
 export default function BudgetList() {
     const budgets = useBudgetStore((state) => state.budgets)

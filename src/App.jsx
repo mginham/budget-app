@@ -1,9 +1,8 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
-import AuthForm from './components/AuthForm'
+import AuthForm from './pages/AuthForm'
 import Dashboard from './pages/Dashboard'
-import AddBudget from './components/AddBudget'
-import BudgetList from './components/BudgetList'
+import EditBudget from './pages/EditBudget'
 
 import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
@@ -31,15 +30,18 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <Dashboard />
-                            <div className="p-4 space-y-6">
-                                <AddBudget />
-                                <BudgetList />
-                            </div>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/edit-budget"
+                    element={
+                        <ProtectedRoute>
+                            <EditBudget />
                         </ProtectedRoute>
                     }
                 />
                 <Route path="*" element={<AuthForm />} />
-
             </Routes>
         </Router>
     )

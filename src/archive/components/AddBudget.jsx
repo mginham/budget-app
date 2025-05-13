@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { useBudgetStore } from '../store/budgetStore'
+import { useBudgetStore } from '../../store/budgetStore'
 
 export default function AddBudget() {
     const { register, handleSubmit, reset } = useForm()
