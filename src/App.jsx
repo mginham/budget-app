@@ -8,6 +8,7 @@ import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'
+import LogPurchases from './pages/LogPurchases'
 
 function App() {
     const setUser = useAuthStore((state) => state.setUser)
@@ -38,6 +39,14 @@ function App() {
                     element={
                         <ProtectedRoute>
                             <EditBudget />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/log-purchases"
+                    element={
+                        <ProtectedRoute>
+                            <LogPurchases />
                         </ProtectedRoute>
                     }
                 />

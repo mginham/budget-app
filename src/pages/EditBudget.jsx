@@ -102,7 +102,7 @@ export default function EditBudget() {
                 <thead>
                     <tr className="bg-gray-100">
                         <th className="p-2 border">Item</th>
-                        <th className="p-2 border">Limit</th>
+                        <th className="p-2 border">Assigned</th>
                         <th className="p-2 border">Expected Date</th>
                         <th className="p-2 border">Actions</th>
                     </tr>
