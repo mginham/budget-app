@@ -11,6 +11,7 @@ import {
 } from "firebase/firestore"
 import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
+import PaymentMethodManager from "../components/PaymentMethodManager"
 
 export default function LogPurchases() {
     const user = useAuthStore((state) => state.user)
@@ -30,16 +31,25 @@ export default function LogPurchases() {
     const [newPaymentMethod, setNewPaymentMethod] = useState("")
     const handleAddPaymentMethod = async () => {
         const name = newPaymentMethod.trim()
+
         if (!name) return
 
         try {
-            await addDoc(collection(db, "users", userId, "paymentMethods"), {
-                name
-            })
+            const docRef = await addDoc(collection(db, "users", userId, "paymentMethods"), { name })
+            const newMethod = { id: docRef.id, name }
+
+            // Create the new sorted list
+            const updatedList = [...paymentMethods, newMethod].sort((a, b) =>
+                a.name.localeCompare(b.name)
+            )
+
+            // Update local state
+            setPaymentMethods(updatedList)
+
             setNewPaymentMethod("") // Clear input
-            fetchPaymentMethods() // Refresh dropdown list
+            setFormData((prev) => ({ ...prev, paymentMethod: name }))
         } catch (err) {
-            console.error("Error adding payment method:", err)
+            console.error("Error adding payment method:", err) // Set dropdown selection
         }
     }
     const handleEditPaymentMethod = (id, name) => {
@@ -51,12 +61,14 @@ export default function LogPurchases() {
         if (!trimmed) return
 
         try {
-            await updateDoc(doc(db, "users", userId, "paymentMethods", id), {
-                name: trimmed
-            })
+            await updateDoc(doc(db, "users", userId, "paymentMethods", id), { name: trimmed })
+            setPaymentMethods((prev) =>
+                prev
+                    .map((m) => (m.id === id ? { ...m, name: trimmed } : m))
+                    .sort((a, b) => a.name.localeCompare(b.name))
+            )
             setEditingMethodId(null)
             setEditedMethodName("")
-            fetchPaymentMethods()
         } catch (err) {
             console.error("Error updating payment method:", err)
         }
@@ -67,7 +79,8 @@ export default function LogPurchases() {
 
         try {
             await deleteDoc(doc(db, "users", userId, "paymentMethods", id))
-            fetchPaymentMethods()
+            const updated = paymentMethods.filter((m) => m.id !== id)
+            setPaymentMethods(updated)
 
             // Clear if deleted method was selected
             if (formData.paymentMethod === paymentMethods.find(pm => pm.id === id)?.name) {
@@ -166,11 +179,6 @@ export default function LogPurchases() {
         {paymentMethods.length === 0 && (
             <p className="text-red-600 mb-4">
                 You have no saved payment methods. Please add some payment methods before logging purchases.
-                {/* You have no saved payment methods. Please{" "}
-                <Link to="/edit-payment-methods" className="underline text-blue-600">
-                    add some payment methods
-                </Link>{" "}
-                before logging purchases. */}
             </p>
         )}
 
@@ -252,74 +260,13 @@ export default function LogPurchases() {
                         </option>
                     ))}
                 </select>
-                <div className="space-y-2 mt-2">
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            placeholder="New payment method"
-                            value={newPaymentMethod}
-                            onChange={(e) => setNewPaymentMethod(e.target.value)}
-                            className="flex-1 p-2 border"
-                        />
-                        <button
-                            type="button"
-                            onClick={handleAddPaymentMethod}
-                            className="bg-blue-600 text-white px-4 py-2 rounded"
-                        >
-                            Add
-                        </button>
-                    </div>
-
-                    {/* Editable list of methods */}
-                    <div className="border p-2 rounded bg-gray-50">
-                        <p className="font-semibold mb-1 text-sm text-gray-700">Your Payment Methods:</p>
-                        {paymentMethods.map((method) => (
-                            <div key={method.id} className="flex items-center gap-2 mb-1">
-                                {editingMethodId === method.id ? (
-                                    <>
-                                        <input
-                                            value={editedMethodName}
-                                            onChange={(e) => setEditedMethodName(e.target.value)}
-                                            className="flex-1 p-1 border"
-                                        />
-                                        <button
-                                            type="button"
-                                            onClick={() => handleSaveEditPaymentMethod(method.id)}
-                                            className="text-green-600 text-sm"
-                                        >
-                                            Save
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => setEditingMethodId(null)}
-                                            className="text-gray-500 text-sm"
-                                        >
-                                            Cancel
-                                        </button>
-                                    </>
-                                ) : (
-                                    <>
-                                        <span className="flex-1 text-sm">{method.name}</span>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleEditPaymentMethod(method.id, method.name)}
-                                            className="text-blue-600 text-sm"
-                                        >
-                                            Edit
-                                        </button>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDeletePaymentMethod(method.id)}
-                                            className="text-red-600 text-sm"
-                                        >
-                                            Delete
-                                        </button>
-                                    </>
-                                )}
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                <PaymentMethodManager
+                    userId={userId}
+                    selectedMethod={formData.paymentMethod}
+                    setSelectedMethod={(val) =>
+                        setFormData((prev) => ({ ...prev, paymentMethod: val }))
+                    }
+                />
                 <div className="flex gap-2">
                     <input
                         type="text"
