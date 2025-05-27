@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { loginUser, registerUser } from "../services/authService"
 import { useNavigate } from "react-router-dom"
+import { Box, TextField, Button, Typography } from "@mui/material";
 
 export default function AuthForm() {
     const [isRegistering, setIsRegistering] = useState(false)
@@ -28,52 +29,70 @@ export default function AuthForm() {
     }
 
     return (
-        <div className="max-w-md mx-auto mt-12 p-4 shadow-lg border rounded">
-            <h2 className="text-xl font-bold mb-4">{isRegistering ? "Register" : "Login"}</h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-                {isRegistering && (
-                    <input
-                        type="text"
-                        value={displayName}
-                        onChange={(e) => setDisplayName(e.target.value)}
-                        placeholder="Display Name"
-                        className="w-full border p-2"
+        <Box
+            maxWidth={400}
+            mx="auto"
+            mt={12}
+            p={4}
+            boxShadow={3}
+            borderRadius={2}
+            border={1}
+            borderColor="grey.300"
+        >
+            <Typography variant="h5" fontWeight="bold" mb={3} textAlign="center">
+                {isRegistering ? "Register" : "Login"}
+            </Typography>
+
+            <form onSubmit={handleSubmit}>
+                <Box display="flex" flexDirection="column" gap={2}>
+                    {isRegistering && (
+                        <TextField
+                            label="Display Name"
+                            variant="outlined"
+                            value={displayName}
+                            onChange={(e) => setDisplayName(e.target.value)}
+                            required
+                            fullWidth
+                        />
+                    )}
+
+                    <TextField
+                        label="Email"
+                        variant="outlined"
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
+                        fullWidth
                     />
-                )}
-                <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="Email"
-                    className="w-full border p-2"
-                    required
-                />
-                <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full border p-2"
-                    required
-                />
-                <button type="submit" className="bg-blue-600 text-white px-4 py-2 w-full">
-                    {isRegistering ? "Register" : "Login"}
-                </button>
+
+                    <TextField
+                        label="Password"
+                        variant="outlined"
+                        type="password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        required
+                        fullWidth
+                    />
+
+                    <Button type="submit" variant="contained" color="primary" fullWidth>
+                        {isRegistering ? "Register" : "Login"}
+                    </Button>
+                </Box>
             </form>
 
-            <p className="mt-4 text-center">
+            <Typography mt={3} textAlign="center">
                 {isRegistering ? "Already have an account?" : "Don't have an account?"}{" "}
-                <button
-                    type="button"
-                    className="text-blue-600 underline"
+                <Button
                     onClick={() => setIsRegistering((prev) => !prev)}
+                    variant="text"
+                    color="primary"
+                    sx={{ textDecoration: "underline", minWidth: 0, padding: 0 }}
                 >
                     {isRegistering ? "Login" : "Register"}
-                </button>
-            </p>
-
-            <h1 className="text-3xl font-bold text-red-300">Tailwind is working!</h1>
-        </div>
-    )
+                </Button>
+            </Typography>
+        </Box>
+    );
 }
