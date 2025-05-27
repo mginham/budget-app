@@ -10,6 +10,14 @@ import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'
 import LogPurchases from './pages/LogPurchases'
 
+function Test() {
+  return (
+    <div className="bg-red-500 text-white p-4 text-center text-xl">
+      If you see a red box with white text, Tailwind is working!
+    </div>
+  );
+}
+
 function App() {
     const setUser = useAuthStore((state) => state.setUser)
 
@@ -23,36 +31,39 @@ function App() {
     }, [setUser])
 
     return (
-        <Router>
-            <Routes>
-                <Route path="/login" element={<AuthForm />} />
-                <Route
-                    path="/dashboard"
-                    element={
-                        <ProtectedRoute>
-                            <Dashboard />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/edit-budget"
-                    element={
-                        <ProtectedRoute>
-                            <EditBudget />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route
-                    path="/log-purchases"
-                    element={
-                        <ProtectedRoute>
-                            <LogPurchases />
-                        </ProtectedRoute>
-                    }
-                />
-                <Route path="*" element={<AuthForm />} />
-            </Routes>
-        </Router>
+        <>
+            <Test />
+            <Router>
+                <Routes>
+                    <Route path="/login" element={<AuthForm />} />
+                    <Route
+                        path="/dashboard"
+                        element={
+                            <ProtectedRoute>
+                                <Dashboard />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/edit-budget"
+                        element={
+                            <ProtectedRoute>
+                                <EditBudget />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/log-purchases"
+                        element={
+                            <ProtectedRoute>
+                                <LogPurchases />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route path="*" element={<AuthForm />} />
+                </Routes>
+            </Router>
+        </>
     )
 }
 
