@@ -11,8 +11,10 @@ import {
     TableRow,
     Stack,
 } from "@mui/material"
+import EditableRow from "./EditableRow"
+import StaticRow from "./StaticRow"
 
-export default function PurchaseForm({
+export default function PurchaseTable({
     purchases,
     editingRowId,
     editingRowData,
@@ -51,117 +53,10 @@ export default function PurchaseForm({
                     ) : (
                         purchases.map((p) => (
                             <TableRow key={p.id}>
-                                {editingRowId === p.id ? (
-                                    <>
-                                        <TableCell>
-                                            <TextField
-                                                name="purchase"
-                                                value={editingRowData.purchase}
-                                                onChange={handleEditChange}
-                                                fullWidth
-                                                size="small"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                name="amount"
-                                                type="number"
-                                                value={editingRowData.amount}
-                                                onChange={handleEditChange}
-                                                fullWidth
-                                                size="small"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Select
-                                                name="paymentMethod"
-                                                value={editingRowData.paymentMethod}
-                                                onChange={handleEditChange}
-                                                fullWidth
-                                                size="small"
-                                            >
-                                                {paymentMethods.map((pm) => (
-                                                    <MenuItem key={pm.id} value={pm.name}>{pm.name}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-                                        <TableCell>
-                                            <Select
-                                                name="lineItem"
-                                                value={editingRowData.lineItem}
-                                                onChange={handleEditChange}
-                                                fullWidth
-                                                size="small"
-                                            >
-                                                {budgets.map((b) => (
-                                                    <MenuItem key={b.id} value={b.lineItem}>{b.lineItem}</MenuItem>
-                                                ))}
-                                            </Select>
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                name="timestamp"
-                                                type="datetime-local"
-                                                value={editingRowData.timestamp}
-                                                onChange={handleEditChange}
-                                                fullWidth
-                                                size="small"
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button size="small" onClick={handleSaveEdit} color="success">Save</Button>
-                                            <Button size="small" onClick={handleCancelEdit} color="warning">Cancel</Button>
-                                        </TableCell>
-                                    </>
-                                ) : (
-                                    <>
-                                        <TableCell align="center">{p.purchase}</TableCell>
-                                        <TableCell align="center">${p.amount?.toFixed(2)}</TableCell>
-                                        <TableCell align="center">{p.paymentMethod}</TableCell>
-                                        <TableCell align="center">{p.lineItem}</TableCell>
-                                        <TableCell align="center">
-                                            {p.timestamp?.seconds
-                                                ? new Date(p.timestamp.seconds * 1000).toLocaleString()
-                                                : "N/A"}
-                                        </TableCell>
-                                        <TableCell align="center">
-                                            <Stack direction="row" spacing={1} justifyContent="center">
-                                                <Button
-                                                    onClick={() => handleStartEdit(p)}
-                                                    variant="outlined"
-                                                    color="primary"
-                                                    sx={{
-                                                        border: '1px solid',
-                                                        borderColor: 'primary.main',
-                                                        borderRadius: 2,
-                                                        px: 2,
-                                                        py: 0.5,
-                                                        textTransform: 'none',
-                                                        minWidth: 80,
-                                                    }}
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <Button
-                                                    onClick={() => handleDelete(p.id)}
-                                                    variant="outlined"
-                                                    color="error"
-                                                    sx={{
-                                                        border: '1px solid',
-                                                        borderColor: 'error.main',
-                                                        borderRadius: 2,
-                                                        px: 2,
-                                                        py: 0.5,
-                                                        textTransform: 'none',
-                                                        minWidth: 80,
-                                                    }}
-                                                >
-                                                    Delete
-                                                </Button>
-                                            </Stack>
-                                        </TableCell>
-                                    </>
-                                )}
+                                {editingRowId === p.id
+                                    ? <EditableRow {...{ editingRowData, handleEditChange, handleSaveEdit, handleCancelEdit, budgets, paymentMethods }} />
+                                    : <StaticRow {...{ p, handleStartEdit, handleDelete }} />
+                                }
                             </TableRow>
                         ))
                     )}
