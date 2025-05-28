@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { db } from "../firebase"
 import {
-    getFirestore,
     collection,
     getDocs,
     addDoc,
@@ -9,8 +8,6 @@ import {
     updateDoc,
     deleteDoc,
     Timestamp,
-    query,
-    where,
     onSnapshot,
 } from "firebase/firestore"
 import { useAuthStore } from "../store/authStore"
@@ -37,28 +34,22 @@ import {
 } from "@mui/material"
 
 export default function LogPurchases() {
-    // Get user info
+
+    // ============================
+    // User Auth & Firestore Hooks
+    // ============================
+
     const user = useAuthStore((state) => state.user)
     const userId = user?.uid
 
-    // Get budget info
+
+    // ============================
+    // State Variables
+    // ============================
+
     const [budgets, setBudgets] = useState([])
-
-    // Get payment methods info
     const [paymentMethods, setPaymentMethods] = useState([])
-    const fetchPaymentMethods = async () => {
-        const snapshot = await getDocs(collection(db, "users", userId, "paymentMethods"))
-        const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }))
-        setPaymentMethods(data.sort((a, b) => a.name.localeCompare(b.name))) // Sort options alphabetically
-    }
-
-    // Get purchases info
     const [purchases, setPurchases] = useState([])
-
-    // Set up new purchase form
     const [formData, setFormData] = useState({
         timestamp: "",
         purchase: "",
@@ -66,6 +57,13 @@ export default function LogPurchases() {
         lineItem: "",
         paymentMethod: ""
     })
+    const [editingRowId, setEditingRowId] = useState(null)
+    const [editingRowData, setEditingRowData] = useState({})
+
+
+    // ============================
+    // Fetch Firestore Data
+    // ============================
 
     useEffect(() => {
         if (!userId) return
@@ -82,6 +80,16 @@ export default function LogPurchases() {
         setBudgets(data)
     }
 
+    const fetchPaymentMethods = async () => {
+        const snapshot = await getDocs(collection(db, "users", userId, "paymentMethods"))
+        const data = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }))
+        setPaymentMethods(data.sort((a, b) => a.name.localeCompare(b.name))) // Sort options alphabetically
+    }
+
+    // Real-time listener for purchases
     useEffect(() => {
         if (!userId) return;
 
@@ -89,15 +97,8 @@ export default function LogPurchases() {
             collection(db, "users", userId, "purchases"),
             (snapshot) => {
                 const data = snapshot.docs
-                .map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }))
-                .sort((a, b) => {
-                    const timeA = a.timestamp?.seconds || 0;
-                    const timeB = b.timestamp?.seconds || 0;
-                    return timeB - timeA; // Descending order
-                })
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
                 setPurchases(data);
             }
         )
@@ -105,18 +106,21 @@ export default function LogPurchases() {
         return () => unsubscribe();
     }, [userId])
 
+
+    // ============================
+    // Form Handlers
+    // ============================
+
     const handleChange = (e) => {
         const { name, value } = e.target
-        setFormData((prev) => ({
-            ...prev,
-            [name]: value
-        }))
+        setFormData((prev) => ({ ...prev, [name]: value }))
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
         const { purchase, amount, lineItem, paymentMethod } = formData
+
         if (!purchase || !amount || !lineItem || !paymentMethod) {
             alert("Please fill in all required fields.")
             return
@@ -146,8 +150,10 @@ export default function LogPurchases() {
         }
     }
 
-    const [editingRowId, setEditingRowId] = useState(null)
-    const [editingRowData, setEditingRowData] = useState({})
+
+    // ============================
+    // Edit & Delete Handlers
+    // ============================
 
     const handleStartEdit = (purchase) => {
         setEditingRowId(purchase.id)
@@ -161,10 +167,7 @@ export default function LogPurchases() {
 
     const handleEditChange = (e) => {
         const { name, value } = e.target
-        setEditingRowData((prev) => ({
-            ...prev,
-            [name]: value,
-        }))
+        setEditingRowData((prev) => ({ ...prev, [name]: value }))
     }
 
     const handleSaveEdit = async () => {
@@ -197,6 +200,9 @@ export default function LogPurchases() {
     }
 
 
+    // ============================
+    // UI Components
+    // ============================
 
     return (
         <Container maxWidth="md" sx={{ py: 4 }}>
@@ -229,7 +235,7 @@ export default function LogPurchases() {
                 </Alert>
             )}
 
-            {/* Form */}
+            {/* New Purchase Form */}
             {budgets.length > 0 && (
                 <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
                     <Typography variant="h6" mb={3}>
@@ -315,7 +321,7 @@ export default function LogPurchases() {
                                 />
                             </Grid>
 
-                            {/* Row 4: Submit Button (full width) */}
+                            {/* Row 4 */}
                             <Grid container size={12} justifyContent="center">
                                 <Grid size={4}>
                                     <Button
