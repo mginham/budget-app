@@ -229,9 +229,22 @@ export default function LogPurchases() {
                         onSubmit={handleSubmit}
                         noValidate
                     >
-                        <Grid container spacing={2}>
-                            {/* Row 1: Timestamp (full width) */}
-                            <Grid item xs={12}>
+                        <Grid container spacing={3} columns={12}>
+                            {/* Row 1: Purchase (full width) */}
+                            <Grid size={12}>
+                                <TextField
+                                    fullWidth
+                                    name="purchase"
+                                    label="Purchase"
+                                    value={formData.purchase}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </Grid>
+
+
+                            {/* Row 2: Timestamp + Amount */}
+                            <Grid size={6}>
                                 <TextField
                                     fullWidth
                                     type="datetime-local"
@@ -242,84 +255,69 @@ export default function LogPurchases() {
                                     InputLabelProps={{ shrink: true }}
                                 />
                             </Grid>
-
-                            {/* Row 2: Purchase + Amount */}
-                            <Grid item xs={12}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            name="purchase"
-                                            label="Purchase"
-                                            value={formData.purchase}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <TextField
-                                            fullWidth
-                                            type="number"
-                                            name="amount"
-                                            label="Amount ($)"
-                                            value={formData.amount}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </Grid>
-                                </Grid>
+                            <Grid size={6}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    name="amount"
+                                    label="Amount ($)"
+                                    value={formData.amount}
+                                    onChange={handleChange}
+                                    required
+                                />
                             </Grid>
 
                             {/* Row 3: Line Item + Payment Method */}
-                            <Grid item xs={12}>
-                                <Grid container spacing={2}>
-                                    <Grid item xs={12} sm={6}>
-                                        <FormControl fullWidth required>
-                                            <InputLabel>Line Item</InputLabel>
-                                            <Select
-                                                name="lineItem"
-                                                value={formData.lineItem}
-                                                onChange={handleChange}
-                                                label="Line Item"
-                                            >
-                                            {budgets.map((b) => (
-                                                <MenuItem key={b.id} value={b.lineItem}>
-                                                    {b.lineItem}
-                                                </MenuItem>
-                                            ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                        <FormControl fullWidth required>
-                                            <InputLabel>Payment Method</InputLabel>
-                                            <Select
-                                                name="paymentMethod"
-                                                value={formData.paymentMethod}
-                                                onChange={handleChange}
-                                                label="Payment Method"
-                                            >
-                                                {paymentMethods.map((method) => (
-                                                    <MenuItem key={method.id} value={method.name}>
-                                                        {method.name}
-                                                    </MenuItem>
-                                                ))}
-                                            </Select>
-                                        </FormControl>
-                                    </Grid>
-                                </Grid>
+                            <Grid size={6}>
+                                <FormControl fullWidth required>
+                                    <InputLabel id="line-item-label">Line Item</InputLabel>
+                                    <Select
+                                        labelId="line-item-label"
+                                        name="lineItem"
+                                        value={formData.lineItem}
+                                        onChange={handleChange}
+                                        label="Line Item"
+                                    >
+                                    {budgets.map((b) => (
+                                        <MenuItem key={b.id} value={b.lineItem}>
+                                            {b.lineItem}
+                                        </MenuItem>
+                                    ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid size={6}>
+                                <FormControl fullWidth required>
+                                    <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                                    <Select
+                                        labelId="payment-method-label"
+                                        name="paymentMethod"
+                                        value={formData.paymentMethod}
+                                        onChange={handleChange}
+                                        label="Payment Method"
+                                    >
+                                        {paymentMethods.map((method) => (
+                                            <MenuItem key={method.id} value={method.name}>
+                                                {method.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
                             </Grid>
 
                             {/* Row 4: Submit Button (full width) */}
-                            <Grid item xs={12}>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    color="success"
-                                    fullWidth
-                                >
-                                    Submit Purchase
-                                </Button>
+                            <Grid container size={12} justifyContent="center">
+                                <Grid size={4}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        color="success"
+                                        sx={{ height: 50 }}
+                                        fullWidth
+                                    >
+                                        Submit Purchase
+                                    </Button>
+                                </Grid>
                             </Grid>
 
                             {/* Payment Method Manager */}
