@@ -1,17 +1,20 @@
 import { useState, useEffect } from "react"
 import { db } from "../firebase"
 import {
+    getFirestore,
     collection,
     getDocs,
     addDoc,
     doc,
     updateDoc,
     deleteDoc,
-    Timestamp
+    Timestamp,
+    query,
+    where,
+    onSnapshot,
 } from "firebase/firestore"
 import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
-import PaymentMethodManager from "../components/PaymentMethodManager"
 import {
     Container,
     Paper,
@@ -28,7 +31,6 @@ import {
     Table,
     TableBody,
     TableCell,
-    TableContainer,
     TableHead,
     TableRow,
 } from "@mui/material"
@@ -48,70 +50,7 @@ export default function LogPurchases() {
         setPaymentMethods(data.sort((a, b) => a.name.localeCompare(b.name))) // Sort options alphabetically
     }
     const [purchases, setPurchases] = useState([])
-    const [newPaymentMethod, setNewPaymentMethod] = useState("")
-    const handleAddPaymentMethod = async () => {
-        const name = newPaymentMethod.trim()
 
-        if (!name) return
-
-        try {
-            const docRef = await addDoc(collection(db, "users", userId, "paymentMethods"), { name })
-            const newMethod = { id: docRef.id, name }
-
-            // Create the new sorted list
-            const updatedList = [...paymentMethods, newMethod].sort((a, b) =>
-                a.name.localeCompare(b.name)
-            )
-
-            // Update local state
-            setPaymentMethods(updatedList)
-
-            setNewPaymentMethod("") // Clear input
-            setFormData((prev) => ({ ...prev, paymentMethod: name }))
-        } catch (err) {
-            console.error("Error adding payment method:", err) // Set dropdown selection
-        }
-    }
-    const handleEditPaymentMethod = (id, name) => {
-        setEditingMethodId(id)
-        setEditedMethodName(name)
-    }
-    const handleSaveEditPaymentMethod = async (id) => {
-        const trimmed = editedMethodName.trim()
-        if (!trimmed) return
-
-        try {
-            await updateDoc(doc(db, "users", userId, "paymentMethods", id), { name: trimmed })
-            setPaymentMethods((prev) =>
-                prev
-                    .map((m) => (m.id === id ? { ...m, name: trimmed } : m))
-                    .sort((a, b) => a.name.localeCompare(b.name))
-            )
-            setEditingMethodId(null)
-            setEditedMethodName("")
-        } catch (err) {
-            console.error("Error updating payment method:", err)
-        }
-    }
-    const handleDeletePaymentMethod = async (id) => {
-        const confirm = window.confirm("Are you sure you want to delete this payment method?")
-        if (!confirm) return
-
-        try {
-            await deleteDoc(doc(db, "users", userId, "paymentMethods", id))
-            const updated = paymentMethods.filter((m) => m.id !== id)
-            setPaymentMethods(updated)
-
-            // Clear if deleted method was selected
-            if (formData.paymentMethod === paymentMethods.find(pm => pm.id === id)?.name) {
-                setFormData((prev) => ({ ...prev, paymentMethod: "" }))
-            }
-        } catch (err) {
-            console.error("Error deleting payment method:", err)
-        }
-    }
-    const [editingMethodId, setEditingMethodId] = useState(null)
-    const [editedMethodName, setEditedMethodName] = useState("")
     const [formData, setFormData] = useState({
         timestamp: "",
         purchase: "",
@@ -123,7 +62,6 @@ export default function LogPurchases() {
     useEffect(() => {
         if (!userId) return
         fetchBudgets()
-        fetchPurchases()
         fetchPaymentMethods()
     }, [userId])
 
@@ -136,14 +74,28 @@ export default function LogPurchases() {
         setBudgets(data)
     }
 
-    const fetchPurchases = async () => {
-        const snapshot = await getDocs(collection(db, "users", userId, "purchases"))
-        const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }))
-        setPurchases(data)
-    }
+    useEffect(() => {
+        if (!userId) return;
+
+        const unsubscribe = onSnapshot(
+            collection(db, "users", userId, "purchases"),
+            (snapshot) => {
+                const data = snapshot.docs
+                .map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                .sort((a, b) => {
+                    const timeA = a.timestamp?.seconds || 0;
+                    const timeB = b.timestamp?.seconds || 0;
+                    return timeB - timeA; // Descending order
+                })
+                setPurchases(data);
+            }
+        )
+
+        return () => unsubscribe();
+    }, [userId])
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -181,7 +133,6 @@ export default function LogPurchases() {
                 lineItem: "",
                 paymentMethod: ""
             })
-            fetchPurchases()
         } catch (err) {
             console.error("Error logging purchase:", err)
         }
@@ -241,7 +192,6 @@ export default function LogPurchases() {
                                     required
                                 />
                             </Grid>
-
 
                             {/* Row 2 */}
                             <Grid size={6}>
@@ -319,79 +269,50 @@ export default function LogPurchases() {
                                     </Button>
                                 </Grid>
                             </Grid>
-
-                            {/* Payment Method Manager */}
-                            {/* <Grid item xs={12}>
-                                <Paper variant="outlined" sx={{ p: 2 }}>
-                                    <PaymentMethodManager
-                                        userId={userId}
-                                        selectedMethod={formData.paymentMethod}
-                                        setSelectedMethod={(val) =>
-                                            setFormData((prev) => ({ ...prev, paymentMethod: val }))
-                                        }
-                                    />
-                                </Paper>
-                            </Grid> */}
-
-                            {/* New Payment Method Input */}
-                            {/* <Grid item xs={12} sm={8}>
-                                <TextField
-                                    fullWidth
-                                    label="New Payment Method"
-                                    value={newPaymentMethod}
-                                    onChange={(e) => setNewPaymentMethod(e.target.value)}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sm={4}>
-                                <Button
-                                    fullWidth
-                                    variant="contained"
-                                    onClick={handleAddPaymentMethod}
-                                    sx={{ height: '100%' }}
-                                >
-                                    Add Method
-                                </Button>
-                            </Grid> */}
                         </Grid>
                     </Box>
                 </Paper>
             )}
 
-            {/* Purchases Table */}
-            {purchases.length > 0 && (
-                <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
-                    <Typography variant="h6" mb={3}>
-                        Logged Purchases
-                    </Typography>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
-                                <TableRow>
-                                    <TableCell>Timestamp</TableCell>
-                                    <TableCell>Purchase</TableCell>
-                                    <TableCell>Amount</TableCell>
-                                    <TableCell>Line Item</TableCell>
-                                    <TableCell>Payment</TableCell>
-                                    <TableCell>Actions</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {purchases.map((p, idx) => (
-                                    <TableRow key={p.id} hover>
-                                        <PurchaseRow
-                                            purchase={p}
-                                            budgetItems={budgets}
-                                            paymentMethods={paymentMethods}
-                                            userId={userId}
-                                            refresh={fetchPurchases}
-                                        />
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </Paper>
-            )}
+            {/* Logged Purchases Table */}
+            <Typography variant="h5" fontWeight="semiBold" mb={2}>
+                Logged Purchases
+            </Typography>
+
+            <Table sx={{ minWidth: 650, border: '1px solid', borderColor: 'divider' }}>
+                <TableHead>
+                    <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                        <TableCell><b>Purchase</b></TableCell>
+                        <TableCell><b>Amount (%)</b></TableCell>
+                        <TableCell><b>Payment Method</b></TableCell>
+                        <TableCell><b>Line Item</b></TableCell>
+                        <TableCell><b>Timestamp</b></TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {purchases.length === 0 ? (
+                        <TableRow>
+                            <TableCell colSpan={5} align="center">
+                                No purchases logged.
+                            </TableCell>
+                        </TableRow>
+                    ) : (
+                        purchases.map((p) => (
+                            <TableRow key={p.id}>
+                                <TableCell>{p.purchase}</TableCell>
+                                <TableCell>${p.amount?.toFixed(2)}</TableCell>
+                                <TableCell>{p.paymentMethod}</TableCell>
+                                <TableCell>{p.lineItem}</TableCell>
+                                <TableCell>
+                                    {p.timestamp?.seconds
+                                        ? new Date(p.timestamp.seconds * 1000).toLocaleString()
+                                        : "N/A"}
+                                </TableCell>
+                            </TableRow>
+                        ))
+                    )}
+                </TableBody>
+            </Table>
         </Container>
     )
 }
