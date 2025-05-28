@@ -12,6 +12,26 @@ import {
 import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
 import PaymentMethodManager from "../components/PaymentMethodManager"
+import {
+    Container,
+    Paper,
+    Typography,
+    Grid,
+    Box,
+    TextField,
+    Select,
+    MenuItem,
+    InputLabel,
+    FormControl,
+    Button,
+    Alert,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+} from "@mui/material"
 
 export default function LogPurchases() {
     const user = useAuthStore((state) => state.user)
@@ -167,164 +187,213 @@ export default function LogPurchases() {
         }
     }
 
-  return (
-    <div className="max-w-4xl mx-auto p-4">
-        <div className="flex justify-between items-center mb-6">
-            <h1 className="text-2xl font-bold">Log Purchases</h1>
-            <Link to="/dashboard" className="text-blue-600 underline">
-                ← Back to Dashboard
-            </Link>
-        </div>
+    return (
+        <Container maxWidth="md" sx={{ py: 4 }}>
+            {/* Header */}
+            <Grid container justifyContent="space-between" alignItems="center" mb={3}>
+                <Typography variant="h4" fontWeight="bold">
+                    Log Purchases
+                </Typography>
+                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
+                    <Typography color="primary" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+                        ← Back to Dashboard
+                    </Typography>
+                </Link>
+            </Grid>
 
-        {paymentMethods.length === 0 && (
-            <p className="text-red-600 mb-4">
-                You have no saved payment methods. Please add some payment methods before logging purchases.
-            </p>
-        )}
+            {/* Alerts */}
+            {paymentMethods.length === 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                    No saved payment methods. Please add some before logging purchases.
+                </Alert>
+            )}
 
-        {budgets.length === 0 ? (
-            <p className="text-red-600 mb-4">
-                You have no budget line items. Please{" "}
-                <Link to="/edit-budget" className="underline text-blue-600">
-                    edit your budget
-                </Link>{" "}
-                to create at least one before logging purchases.
-            </p>
-        ) : (
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-            <div>
-                <label className="block font-medium">Timestamp (optional)</label>
-                <input
-                    type="datetime-local"
-                    name="timestamp"
-                    value={formData.timestamp}
-                    onChange={handleChange}
-                    className="w-full p-2 border"
-                />
-            </div>
+            {budgets.length === 0 && (
+                <Alert severity="warning" sx={{ mb: 2 }}>
+                    No budget line items. Please{' '}
+                    <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                        edit your budget
+                    </Link>{' '}
+                    before logging purchases.
+                </Alert>
+            )}
 
-            <div>
-                <label className="block font-medium">Purchase *</label>
-                <input
-                    name="purchase"
-                    value={formData.purchase}
-                    onChange={handleChange}
-                    className="w-full p-2 border"
-                    required
-                />
-            </div>
-
-            <div>
-                <label className="block font-medium">Amount ($) *</label>
-                <input
-                    type="number"
-                    name="amount"
-                    value={formData.amount}
-                    onChange={handleChange}
-                    className="w-full p-2 border"
-                    required
-                />
-            </div>
-
-            <div>
-                <label className="block font-medium">Spending Line Item *</label>
-                <select
-                    name="lineItem"
-                    value={formData.lineItem}
-                    onChange={handleChange}
-                    className="w-full p-2 border"
-                    required
-                >
-                <option value="">-- Select Line Item --</option>
-                {budgets.map((b) => (
-                    <option key={b.id} value={b.lineItem}>
-                        {b.lineItem}
-                    </option>
-                ))}
-                </select>
-            </div>
-
-            <div>
-                <label className="block font-medium">Payment Method *</label>
-                <select
-                    name="paymentMethod"
-                    value={formData.paymentMethod}
-                    onChange={handleChange}
-                    className="w-full p-2 border mb-2"
-                    required
-                >
-                    <option value="">-- Select Payment Method --</option>
-                    {paymentMethods.map((method) => (
-                        <option key={method.id} value={method.name}>
-                            {method.name}
-                        </option>
-                    ))}
-                </select>
-                <PaymentMethodManager
-                    userId={userId}
-                    selectedMethod={formData.paymentMethod}
-                    setSelectedMethod={(val) =>
-                        setFormData((prev) => ({ ...prev, paymentMethod: val }))
-                    }
-                />
-                <div className="flex gap-2">
-                    <input
-                        type="text"
-                        placeholder="New payment method"
-                        value={newPaymentMethod}
-                        onChange={(e) => setNewPaymentMethod(e.target.value)}
-                        className="flex-1 p-2 border"
-                    />
-                    <button
-                        type="button"
-                        onClick={handleAddPaymentMethod}
-                        className="bg-blue-600 text-white px-4 py-2 rounded"
+            {/* Form */}
+            {budgets.length > 0 && (
+                <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
+                    <Typography variant="h6" mb={3}>
+                        New Purchase
+                    </Typography>
+                    <Box
+                        component="form"
+                        onSubmit={handleSubmit}
+                        noValidate
                     >
-                        Add
-                    </button>
-                </div>
-            </div>
+                        <Grid container spacing={2}>
+                            {/* Row 1: Timestamp (full width) */}
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    type="datetime-local"
+                                    name="timestamp"
+                                    label="Timestamp (optional)"
+                                    value={formData.timestamp}
+                                    onChange={handleChange}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                            </Grid>
 
-            <div className="md:col-span-2">
-                <button
-                    type="submit"
-                    className="bg-green-600 text-white px-4 py-2 rounded"
-                >
-                    Submit Purchase
-                </button>
-            </div>
-            </form>
-        )}
+                            {/* Row 2: Purchase + Amount */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            name="purchase"
+                                            label="Purchase"
+                                            value={formData.purchase}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <TextField
+                                            fullWidth
+                                            type="number"
+                                            name="amount"
+                                            label="Amount ($)"
+                                            value={formData.amount}
+                                            onChange={handleChange}
+                                            required
+                                        />
+                                    </Grid>
+                                </Grid>
+                            </Grid>
 
-        {purchases.length > 0 && (
-            <div className="overflow-x-auto">
-                <h2 className="text-xl font-bold mt-8 mb-2">Logged Purchases</h2>
-                <table className="w-full border-collapse border">
-                    <thead className="bg-gray-100">
-                        <tr>
-                            <th className="p-2 border">Timestamp</th>
-                            <th className="p-2 border">Purchase</th>
-                            <th className="p-2 border">Amount</th>
-                            <th className="p-2 border">Spending Line Item</th>
-                            <th className="p-2 border">Payment Method</th>
-                            <th className="p-2 border">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {purchases.map((p) => (
-                            <PurchaseRow
-                                key={p.id}
-                                purchase={p}
-                                budgetItems={budgetItems}
-                                paymentMethods={paymentMethods}
-                                userId={userId}
-                                refresh={fetchPurchases}
-                            />
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        )}
-    </div>
-  )
+                            {/* Row 3: Line Item + Payment Method */}
+                            <Grid item xs={12}>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={12} sm={6}>
+                                        <FormControl fullWidth required>
+                                            <InputLabel>Line Item</InputLabel>
+                                            <Select
+                                                name="lineItem"
+                                                value={formData.lineItem}
+                                                onChange={handleChange}
+                                                label="Line Item"
+                                            >
+                                            {budgets.map((b) => (
+                                                <MenuItem key={b.id} value={b.lineItem}>
+                                                    {b.lineItem}
+                                                </MenuItem>
+                                            ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <FormControl fullWidth required>
+                                            <InputLabel>Payment Method</InputLabel>
+                                            <Select
+                                                name="paymentMethod"
+                                                value={formData.paymentMethod}
+                                                onChange={handleChange}
+                                                label="Payment Method"
+                                            >
+                                                {paymentMethods.map((method) => (
+                                                    <MenuItem key={method.id} value={method.name}>
+                                                        {method.name}
+                                                    </MenuItem>
+                                                ))}
+                                            </Select>
+                                        </FormControl>
+                                    </Grid>
+                                </Grid>
+                            </Grid>
+
+                            {/* Row 4: Submit Button (full width) */}
+                            <Grid item xs={12}>
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    color="success"
+                                    fullWidth
+                                >
+                                    Submit Purchase
+                                </Button>
+                            </Grid>
+
+                            {/* Payment Method Manager */}
+                            {/* <Grid item xs={12}>
+                                <Paper variant="outlined" sx={{ p: 2 }}>
+                                    <PaymentMethodManager
+                                        userId={userId}
+                                        selectedMethod={formData.paymentMethod}
+                                        setSelectedMethod={(val) =>
+                                            setFormData((prev) => ({ ...prev, paymentMethod: val }))
+                                        }
+                                    />
+                                </Paper>
+                            </Grid> */}
+
+                            {/* New Payment Method Input */}
+                            {/* <Grid item xs={12} sm={8}>
+                                <TextField
+                                    fullWidth
+                                    label="New Payment Method"
+                                    value={newPaymentMethod}
+                                    onChange={(e) => setNewPaymentMethod(e.target.value)}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sm={4}>
+                                <Button
+                                    fullWidth
+                                    variant="contained"
+                                    onClick={handleAddPaymentMethod}
+                                    sx={{ height: '100%' }}
+                                >
+                                    Add Method
+                                </Button>
+                            </Grid> */}
+                        </Grid>
+                    </Box>
+                </Paper>
+            )}
+
+            {/* Purchases Table */}
+            {purchases.length > 0 && (
+                <Paper elevation={2} sx={{ p: 4, borderRadius: 2 }}>
+                    <Typography variant="h6" mb={3}>
+                        Logged Purchases
+                    </Typography>
+                    <TableContainer>
+                        <Table size="small">
+                            <TableHead sx={{ backgroundColor: '#f5f5f5' }}>
+                                <TableRow>
+                                    <TableCell>Timestamp</TableCell>
+                                    <TableCell>Purchase</TableCell>
+                                    <TableCell>Amount</TableCell>
+                                    <TableCell>Line Item</TableCell>
+                                    <TableCell>Payment</TableCell>
+                                    <TableCell>Actions</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {purchases.map((p, idx) => (
+                                    <TableRow key={p.id} hover>
+                                        <PurchaseRow
+                                            purchase={p}
+                                            budgetItems={budgets}
+                                            paymentMethods={paymentMethods}
+                                            userId={userId}
+                                            refresh={fetchPurchases}
+                                        />
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+                </Paper>
+            )}
+        </Container>
+    )
 }

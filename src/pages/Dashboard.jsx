@@ -1,8 +1,21 @@
 import { useAuthStore } from '../store/authStore'
-import { Link } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
+import {
+  Box,
+  Typography,
+  Button,
+  Table,
+  TableHead,
+  TableBody,
+  TableRow,
+  TableCell,
+  Link,
+  CircularProgress,
+  Stack,
+} from '@mui/material'
 
 export default function Dashboard() {
     // Retrieve user and logout info from auth store
@@ -35,61 +48,53 @@ export default function Dashboard() {
     }, [userId])
 
     return (
-        <div className="p-4">
-            <h1 className="text-xl font-bold">Welcome, {user?.displayName || user?.email}!</h1>
+        <Box p={4} maxWidth={800} mx="auto">
+            <Typography variant="h4" fontWeight="bold" mb={3}>
+                Welcome, {user?.displayName || user?.email}!
+            </Typography>
 
-            <Link
-                to="/edit-budget"
-                className="text-blue-600 underline"
-            >
-                Edit Budget
-            </Link>
+            <Stack direction="row" spacing={2} mb={3}>
+                <Link component={RouterLink} to="/edit-budget" underline="hover" color="primary">
+                    Edit Budget
+                </Link>
+                <Link component={RouterLink} to="/log-purchases" underline="hover" color="primary">
+                    Log Purchases
+                </Link>
+                <Button variant="contained" color="error" onClick={logout}>
+                    Logout
+                </Button>
+            </Stack>
 
-            <Link
-                to="/log-purchases"
-                className="text-blue-600 underline"
-            >
-                Log Purchases
-            </Link>
-
-            <button
-                onClick={logout}
-                className="bg-red-600 text-white px-4 py-2 mt-4"
-            >
-                Logout
-            </button>
-
-            <h2 className="text-lg font-semibold mb-2">Your Budget</h2>
+            <Typography variant="h5" fontWeight="semiBold" mb={2}>
+                Your Budget
+            </Typography>
 
             {loading ? (
-                <p>Loading budget...</p>
+                <Box display="flex" justifyContent="center" my={4}>
+                    <CircularProgress />
+                </Box>
             ) : budgets.length === 0 ? (
-                <p>No budget items found.</p>
+                <Typography>No budget items found.</Typography>
             ) : (
-                <table className="w-full table-auto border-collapse">
-                    <thead>
-                        <tr className="bg-gray-100">
-                            <th className="p-2 border">Item</th>
-                            <th className="p-2 border">Assigned</th>
-                            <th className="p-2 border">Expected Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {budgets.map((item) => (
-                            <tr key={item.id} className="border-t">
-                                <td className="p-2 border">{item.lineItem}</td>
-                                <td className="p-2 border">
-                                    ${parseFloat(item.spendingLimit).toFixed(2)}
-                                </td>
-                                <td className="p-2 border">
-                                    {item.expectedDate || '-'}
-                                </td>
-                            </tr>
+                <Table sx={{ minWidth: 650, border: '1px solid', borderColor: 'divider' }}>
+                    <TableHead>
+                        <TableRow sx={{ backgroundColor: 'action.hover' }}>
+                            <TableCell><b>Item</b></TableCell>
+                            <TableCell><b>Assigned</b></TableCell>
+                            <TableCell><b>Expected Date</b></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {budgets.map(item => (
+                            <TableRow key={item.id} hover>
+                                <TableCell>{item.lineItem}</TableCell>
+                                <TableCell>${parseFloat(item.spendingLimit).toFixed(2)}</TableCell>
+                                <TableCell>{item.expectedDate || '-'}</TableCell>
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
+                    </TableBody>
+                </Table>
             )}
-
-        </div>
+        </Box>
     )
 }
