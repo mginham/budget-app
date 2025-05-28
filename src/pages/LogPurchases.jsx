@@ -230,7 +230,7 @@ export default function LogPurchases() {
                         noValidate
                     >
                         <Grid container spacing={3} columns={12}>
-                            {/* Row 1: Purchase (full width) */}
+                            {/* Row 1 */}
                             <Grid size={12}>
                                 <TextField
                                     fullWidth
@@ -243,18 +243,7 @@ export default function LogPurchases() {
                             </Grid>
 
 
-                            {/* Row 2: Timestamp + Amount */}
-                            <Grid size={6}>
-                                <TextField
-                                    fullWidth
-                                    type="datetime-local"
-                                    name="timestamp"
-                                    label="Timestamp (optional)"
-                                    value={formData.timestamp}
-                                    onChange={handleChange}
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </Grid>
+                            {/* Row 2 */}
                             <Grid size={6}>
                                 <TextField
                                     fullWidth
@@ -266,8 +255,26 @@ export default function LogPurchases() {
                                     required
                                 />
                             </Grid>
+                            <Grid size={6}>
+                                <FormControl fullWidth required>
+                                    <InputLabel id="payment-method-label">Payment Method</InputLabel>
+                                    <Select
+                                        labelId="payment-method-label"
+                                        name="paymentMethod"
+                                        value={formData.paymentMethod}
+                                        onChange={handleChange}
+                                        label="Payment Method"
+                                    >
+                                        {paymentMethods.map((method) => (
+                                            <MenuItem key={method.id} value={method.name}>
+                                                {method.name}
+                                            </MenuItem>
+                                        ))}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
 
-                            {/* Row 3: Line Item + Payment Method */}
+                            {/* Row 3 */}
                             <Grid size={6}>
                                 <FormControl fullWidth required>
                                     <InputLabel id="line-item-label">Line Item</InputLabel>
@@ -287,22 +294,15 @@ export default function LogPurchases() {
                                 </FormControl>
                             </Grid>
                             <Grid size={6}>
-                                <FormControl fullWidth required>
-                                    <InputLabel id="payment-method-label">Payment Method</InputLabel>
-                                    <Select
-                                        labelId="payment-method-label"
-                                        name="paymentMethod"
-                                        value={formData.paymentMethod}
-                                        onChange={handleChange}
-                                        label="Payment Method"
-                                    >
-                                        {paymentMethods.map((method) => (
-                                            <MenuItem key={method.id} value={method.name}>
-                                                {method.name}
-                                            </MenuItem>
-                                        ))}
-                                    </Select>
-                                </FormControl>
+                                <TextField
+                                    fullWidth
+                                    type="datetime-local"
+                                    name="timestamp"
+                                    label="Timestamp (optional)"
+                                    value={formData.timestamp}
+                                    onChange={handleChange}
+                                    InputLabelProps={{ shrink: true }}
+                                />
                             </Grid>
 
                             {/* Row 4: Submit Button (full width) */}
