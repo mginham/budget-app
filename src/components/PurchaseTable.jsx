@@ -36,7 +36,7 @@ export default function PurchaseTable({
                 <TableHead>
                     <TableRow sx={{ backgroundColor: 'action.hover' }}>
                         <TableCell align="center"><b>Purchase</b></TableCell>
-                        <TableCell align="center"><b>Amount (%)</b></TableCell>
+                        <TableCell align="center"><b>Amount ($)</b></TableCell>
                         <TableCell align="center"><b>Payment Method</b></TableCell>
                         <TableCell align="center"><b>Line Item</b></TableCell>
                         <TableCell align="center"><b>Timestamp</b></TableCell>
