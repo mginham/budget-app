@@ -7,8 +7,11 @@ import {
 export default function StaticRow({
     p,
     handleStartEdit,
-    handleDelete
+    handleDelete,
+    editingRowId,
 }) {
+    const disableButtons = editingRowId !== null && editingRowId !== p.id;
+
     return (
         <>
             <TableCell align="center">{p.purchase}</TableCell>
@@ -21,7 +24,7 @@ export default function StaticRow({
                     : "N/A"}
             </TableCell>
             <TableCell align="center">
-                <Stack direction="row" spacing={1} justifyContent="center">
+                <Stack direction="column" spacing={1} justifyContent="center">
                     <Button
                         onClick={() => handleStartEdit(p)}
                         variant="outlined"
@@ -35,6 +38,7 @@ export default function StaticRow({
                             textTransform: 'none',
                             minWidth: 80,
                         }}
+                        disabled={disableButtons}
                     >
                         Edit
                     </Button>
@@ -51,6 +55,7 @@ export default function StaticRow({
                             textTransform: 'none',
                             minWidth: 80,
                         }}
+                        disabled={disableButtons}
                     >
                         Delete
                     </Button>

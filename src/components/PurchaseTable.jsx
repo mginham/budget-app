@@ -32,15 +32,15 @@ export default function PurchaseTable({
                 Logged Purchases
             </Typography>
 
-            <Table sx={{ minWidth: 650, border: '1px solid', borderColor: 'divider' }}>
+            <Table sx={{ tableLayout: 'fixed', minWidth: 650, maxWidth: 850, border: '1px solid', borderColor: 'divider' }}>
                 <TableHead>
                     <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                        <TableCell align="center"><b>Purchase</b></TableCell>
-                        <TableCell align="center"><b>Amount ($)</b></TableCell>
-                        <TableCell align="center"><b>Payment Method</b></TableCell>
-                        <TableCell align="center"><b>Line Item</b></TableCell>
-                        <TableCell align="center"><b>Timestamp</b></TableCell>
-                        <TableCell align="center"><b>Actions</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Purchase</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Amount ($)</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Payment Method</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Line Item</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Timestamp</b></TableCell>
+                        <TableCell align="center" sx={{ width: '15%' }}><b>Actions</b></TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
@@ -55,7 +55,7 @@ export default function PurchaseTable({
                             <TableRow key={p.id}>
                                 {editingRowId === p.id
                                     ? <EditableRow {...{ editingRowData, handleEditChange, handleSaveEdit, handleCancelEdit, budgets, paymentMethods }} />
-                                    : <StaticRow {...{ p, handleStartEdit, handleDelete }} />
+                                    : <StaticRow {...{ p, handleStartEdit, handleDelete, editingRowId }} />
                                 }
                             </TableRow>
                         ))

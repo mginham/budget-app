@@ -4,6 +4,7 @@ import {
     MenuItem,
     Button,
     TableCell,
+    Stack,
 } from "@mui/material"
 
 export default function EditableRow({
@@ -16,7 +17,7 @@ export default function EditableRow({
 }) {
     return (
         <>
-            <TableCell>
+            <TableCell align="center">
                 <TextField
                     name="purchase"
                     value={editingRowData.purchase}
@@ -25,7 +26,7 @@ export default function EditableRow({
                     size="small"
                 />
             </TableCell>
-            <TableCell>
+            <TableCell align="center">
                 <TextField
                     name="amount"
                     type="number"
@@ -35,7 +36,7 @@ export default function EditableRow({
                     size="small"
                 />
             </TableCell>
-            <TableCell>
+            <TableCell align="center">
                 <Select
                     name="paymentMethod"
                     value={editingRowData.paymentMethod}
@@ -48,7 +49,7 @@ export default function EditableRow({
                     ))}
                 </Select>
             </TableCell>
-            <TableCell>
+            <TableCell align="center">
                 <Select
                     name="lineItem"
                     value={editingRowData.lineItem}
@@ -61,7 +62,7 @@ export default function EditableRow({
                     ))}
                 </Select>
             </TableCell>
-            <TableCell>
+            <TableCell align="center">
                 <TextField
                     name="timestamp"
                     type="datetime-local"
@@ -71,9 +72,43 @@ export default function EditableRow({
                     size="small"
                 />
             </TableCell>
-            <TableCell>
-                <Button size="small" onClick={handleSaveEdit} color="success">Save</Button>
-                <Button size="small" onClick={handleCancelEdit} color="warning">Cancel</Button>
+            <TableCell align="center">
+                <Stack direction="column" spacing={1} justifyContent="center">
+                    <Button
+                        size="small"
+                        onClick={handleSaveEdit}
+                        variant="outlined"
+                        color="success"
+                        sx={{
+                            border: '1px solid',
+                            borderColor: 'success.main',
+                            borderRadius: 2,
+                            px: 2,
+                            py: 0.5,
+                            textTransform: 'none',
+                            minWidth: 80,
+                        }}
+                    >
+                        Save
+                    </Button>
+                    <Button
+                        size="small"
+                        onClick={handleCancelEdit}
+                        variant="outlined"
+                        color="warning"
+                        sx={{
+                            border: '1px solid',
+                            borderColor: 'warning.main',
+                            borderRadius: 2,
+                            px: 2,
+                            py: 0.5,
+                            textTransform: 'none',
+                            minWidth: 80,
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                </Stack>
             </TableCell>
         </>
     )
