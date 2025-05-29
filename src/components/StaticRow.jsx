@@ -20,7 +20,11 @@ export default function StaticRow({
             <TableCell align="center">{p.lineItem}</TableCell>
             <TableCell align="center">
                 {p.timestamp?.seconds
-                    ? new Date(p.timestamp.seconds * 1000).toLocaleString()
+                    ? new Date(p.timestamp.seconds * 1000).toLocaleDateString(undefined, {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                        })
                     : "N/A"}
             </TableCell>
             <TableCell align="center">

@@ -24,6 +24,11 @@ export default function EditableRow({
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
+                    sx={{
+                        '& .MuiInputBase-input': {
+                            fontSize: '0.875rem',
+                        },
+                    }}
                 />
             </TableCell>
             <TableCell align="center">
@@ -34,6 +39,11 @@ export default function EditableRow({
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
+                    sx={{
+                        '& .MuiInputBase-input': {
+                            fontSize: '0.875rem',
+                        },
+                    }}
                 />
             </TableCell>
             <TableCell align="center">
@@ -43,6 +53,7 @@ export default function EditableRow({
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
+                    sx={{ fontSize: '0.875rem' }}
                 >
                     {paymentMethods.map((pm) => (
                         <MenuItem key={pm.id} value={pm.name}>{pm.name}</MenuItem>
@@ -56,6 +67,7 @@ export default function EditableRow({
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
+                    sx={{ fontSize: '0.875rem' }}
                 >
                     {budgets.map((b) => (
                         <MenuItem key={b.id} value={b.lineItem}>{b.lineItem}</MenuItem>
@@ -70,6 +82,11 @@ export default function EditableRow({
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
+                    sx={{
+                        '& .MuiInputBase-input': {
+                            fontSize: '0.875rem',
+                        },
+                    }}
                 />
             </TableCell>
             <TableCell align="center">
