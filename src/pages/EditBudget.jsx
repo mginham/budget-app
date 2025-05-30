@@ -25,7 +25,7 @@ import {
     Paper,
     Stack,
     Link,
-} from "@mui/material"
+} from '../components/mui';
 
 export default function EditBudget() {
     const user = useAuthStore((state) => state.user)

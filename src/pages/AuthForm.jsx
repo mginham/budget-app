@@ -1,7 +1,12 @@
 import { useState } from "react"
 import { loginUser, registerUser } from "../services/authService"
 import { useNavigate } from "react-router-dom"
-import { Box, TextField, Button, Typography } from "@mui/material";
+import {
+    Box,
+    TextField,
+    Button,
+    Typography
+} from '../components/mui';
 
 export default function AuthForm() {
     const [isRegistering, setIsRegistering] = useState(false)

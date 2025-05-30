@@ -5,7 +5,7 @@ import {
     TableCell,
     TableHead,
     TableRow,
-} from "@mui/material"
+} from '../components/mui';
 import EditableRow from "./EditableRow"
 import StaticRow from "./StaticRow"
 

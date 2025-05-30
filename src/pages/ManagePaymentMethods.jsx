@@ -4,7 +4,7 @@ import {
     Paper,
     Typography,
     Breadcrumbs,
-} from "@mui/material"
+} from '../components/mui';
 import { Link } from "react-router-dom"
 import PaymentMethodManager from '../components/PaymentMethodManager';
 

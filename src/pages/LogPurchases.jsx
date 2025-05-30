@@ -18,7 +18,7 @@ import {
     Grid,
     Alert,
     Button,
-} from "@mui/material"
+} from '../components/mui';
 import PurchaseForm from "../components/PurchaseForm"
 import PurchaseTable from "../components/PurchaseTable"
 

@@ -4,18 +4,18 @@ import { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import {
-  Box,
-  Typography,
-  Button,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
-  Link,
-  CircularProgress,
-  Stack,
-} from '@mui/material'
+    Box,
+    Typography,
+    Button,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Link,
+    CircularProgress,
+    Stack,
+} from '../components/mui';
 
 export default function Dashboard() {
     // Retrieve user and logout info from auth store
