@@ -1,16 +1,16 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AuthForm from './pages/AuthForm'
+import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
 import EditBudget from './pages/EditBudget'
+import LogPurchases from './pages/LogPurchases'
+import ManagePaymentMethods from './pages/ManagePaymentMethods';
 
 import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'
-import LogPurchases from './pages/LogPurchases'
-import ManagePaymentMethods from './pages/ManagePaymentMethods';
-
 
 function App() {
     const setUser = useAuthStore((state) => state.setUser)
@@ -28,39 +28,36 @@ function App() {
         <>
             <Router>
                 <Routes>
+                    {/* Public route */}
                     <Route path="/login" element={<AuthForm />} />
+
+                    {/* Protected routes with shared layout */}
                     <Route
-                        path="/dashboard"
                         element={
                             <ProtectedRoute>
-                                <Dashboard />
+                                <AppLayout />
                             </ProtectedRoute>
                         }
-                    />
-                    <Route
-                        path="/edit-budget"
-                        element={
-                            <ProtectedRoute>
-                                <EditBudget />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/log-purchases"
-                        element={
-                            <ProtectedRoute>
-                                <LogPurchases />
-                            </ProtectedRoute>
-                        }
-                    />
-                    <Route
-                        path="/manage-payment-methods"
-                        element={
-                            <ProtectedRoute>
-                                <ManagePaymentMethods />
-                            </ProtectedRoute>
-                        }
-                    />
+                    >
+                        <Route
+                            path="/dashboard"
+                            element={ <Dashboard /> }
+                        />
+                        <Route
+                            path="/edit-budget"
+                            element={ <EditBudget /> }
+                        />
+                        <Route
+                            path="/log-purchases"
+                            element={ <LogPurchases /> }
+                        />
+                        <Route
+                            path="/manage-payment-methods"
+                            element={ <ManagePaymentMethods /> }
+                        />
+                    </Route>
+
+                    {/* Catch-all */}
                     <Route path="*" element={<AuthForm />} />
                 </Routes>
             </Router>

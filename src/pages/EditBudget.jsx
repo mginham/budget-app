@@ -114,13 +114,13 @@ export default function EditBudget() {
                 mb={3}
             >
                 <Typography variant="h4" component="h1" fontWeight="bold">
-                    Edit Budget Line Items
+                    Edit Budget
                 </Typography>
                 <Link
                     component={RouterLink}
                     to="/dashboard"
                     underline="hover"
-                    color="primary"
+                    color="link"
                     sx={{ fontWeight: "medium" }}
                 >
                     ← Back to Dashboard

@@ -5,17 +5,24 @@ import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import {
     Box,
-    Typography,
-    Button,
-    Table,
-    TableHead,
-    TableBody,
-    TableRow,
-    TableCell,
-    Link,
     CircularProgress,
+    Divider,
+    IconButton,
+    Link,
+    ListItemIcon,
+    Menu,
+    MenuItem,
     Stack,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    Typography,
 } from '../components/mui';
+import MenuIcon from '@mui/icons-material/Menu';
+import Logout from '@mui/icons-material/Logout';
+
 
 export default function Dashboard() {
     // Retrieve user and logout info from auth store
@@ -24,6 +31,17 @@ export default function Dashboard() {
 
     const [budgets, setBudgets] = useState([])
     const [loading, setLoading] = useState(true)
+
+    const [anchorEl, setAnchorEl] = useState(null)
+    const open = Boolean(anchorEl)
+
+    const handleMenuOpen = (event) => {
+        setAnchorEl(event.currentTarget)
+    }
+
+    const handleMenuClose = () => {
+        setAnchorEl(null)
+    }
 
     useEffect(() => {
         if (!userId) return
@@ -48,23 +66,7 @@ export default function Dashboard() {
     }, [userId])
 
     return (
-        <Box p={4} maxWidth={800} mx="auto">
-            <Typography variant="h4" fontWeight="bold" mb={3}>
-                Welcome, {user?.displayName || user?.email}!
-            </Typography>
-
-            <Stack direction="row" spacing={2} mb={3}>
-                <Link component={RouterLink} to="/edit-budget" underline="hover" color="link">
-                    Edit Budget
-                </Link>
-                <Link component={RouterLink} to="/log-purchases" underline="hover" color="link">
-                    Log Purchases
-                </Link>
-                <Button variant="contained" color="error" onClick={logout}>
-                    Logout
-                </Button>
-            </Stack>
-
+        <>
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
                 Your Budget
             </Typography>
@@ -95,6 +97,6 @@ export default function Dashboard() {
                     </TableBody>
                 </Table>
             )}
-        </Box>
+        </>
     )
 }
