@@ -15,13 +15,21 @@ const theme = createTheme({
             main: '#1976d2',
         },
         secondary: {
-            main: '#9c27b0',
+            main: '#d1701f',
         },
         error: {
             main: '#f44336',
         },
         background: {
-            default: '#e4decd',
+            // default: '#e4decd',
+            default: '#5ea0e1',
+        },
+        link: {
+            main: '#1b3a57',
+        },
+        custom: {
+            boxBackground: '#FCFCFC',
+            tableHeader: '#d6dce2',
         },
     },
     shape: {
@@ -46,6 +54,59 @@ const theme = createTheme({
                 variant: 'outlined',
                 fullWidth: true,
                 size: 'small',
+            },
+        },
+        MuiContainer: {
+            defaultProps: {
+                maxWidth: 'md',
+            },
+            styleOverrides: {
+                root: {
+                    paddingTop: '32px',
+                    paddingBottom: '32px',
+                },
+            },
+        },
+        MuiTableContainer: {
+            styleOverrides: {
+                root: {
+                    borderRadius: 8,
+                    overflow: 'hidden',
+                    border: '1px solid',
+                    borderColor: '#c9c9c9',
+                },
+            },
+        },
+        MuiTable: {
+            styleOverrides: {
+                root: {
+                    tableLayout: 'fixed',
+                    minWidth: 650,
+                    maxWidth: 850,
+                },
+            },
+        },
+        MuiTableHead: {
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    backgroundColor: theme.palette.custom.tableHeader,
+                }),
+            },
+        },
+        MuiTableBody: {
+            styleOverrides: {
+                root: ({ theme }) => ({
+                    backgroundColor: theme.palette.custom.boxBackground,
+                }),
+            },
+        },
+        MuiTableCell: {
+            styleOverrides: {
+                head: {
+                    textAlign: 'center',
+                    width: '15%',
+                    fontWeight: 'bold',
+                },
             },
         },
     },

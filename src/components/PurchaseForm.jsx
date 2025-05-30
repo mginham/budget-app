@@ -35,25 +35,25 @@ export default function PurchaseForm({
                     {/* Row 1 */}
                     <Grid size={12}>
                         <TextField
-                            fullWidth
                             name="purchase"
                             label="Purchase"
                             value={formData.purchase}
                             onChange={handleChange}
                             required
+                            size="medium"
                         />
                     </Grid>
 
                     {/* Row 2 */}
                     <Grid size={6}>
                         <TextField
-                            fullWidth
                             type="number"
                             name="amount"
                             label="Amount ($)"
                             value={formData.amount}
                             onChange={handleChange}
                             required
+                            size="medium"
                         />
                     </Grid>
                     <Grid size={6}>
@@ -96,13 +96,13 @@ export default function PurchaseForm({
                     </Grid>
                     <Grid size={6}>
                         <TextField
-                            fullWidth
                             type="datetime-local"
                             name="timestamp"
                             label="Timestamp (optional)"
                             value={formData.timestamp}
                             onChange={handleChange}
                             InputLabelProps={{ shrink: true }}
+                            size="medium"
                         />
                     </Grid>
 
@@ -113,7 +113,6 @@ export default function PurchaseForm({
                             variant="contained"
                             color="success"
                             sx={{ height: 50, width: "30%" }}
-                            fullWidth
                         >
                             <b>Submit Purchase</b>
                         </Button>

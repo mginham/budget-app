@@ -54,10 +54,10 @@ export default function Dashboard() {
             </Typography>
 
             <Stack direction="row" spacing={2} mb={3}>
-                <Link component={RouterLink} to="/edit-budget" underline="hover" color="primary">
+                <Link component={RouterLink} to="/edit-budget" underline="hover" color="link">
                     Edit Budget
                 </Link>
-                <Link component={RouterLink} to="/log-purchases" underline="hover" color="primary">
+                <Link component={RouterLink} to="/log-purchases" underline="hover" color="link">
                     Log Purchases
                 </Link>
                 <Button variant="contained" color="error" onClick={logout}>

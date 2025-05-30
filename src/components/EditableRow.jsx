@@ -94,7 +94,7 @@ export default function EditableRow({
                     <Button
                         size="small"
                         onClick={handleSaveEdit}
-                        variant="outlined"
+                        variant="contained"
                         color="success"
                         sx={{
                             border: '1px solid',
@@ -111,7 +111,7 @@ export default function EditableRow({
                     <Button
                         size="small"
                         onClick={handleCancelEdit}
-                        variant="outlined"
+                        variant="contained"
                         color="warning"
                         sx={{
                             border: '1px solid',

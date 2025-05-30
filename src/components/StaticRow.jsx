@@ -31,7 +31,7 @@ export default function StaticRow({
                 <Stack direction="column" spacing={1} justifyContent="center">
                     <Button
                         onClick={() => handleStartEdit(p)}
-                        variant="outlined"
+                        variant="contained"
                         color="primary"
                         sx={{
                             border: '1px solid',
@@ -48,7 +48,7 @@ export default function StaticRow({
                     </Button>
                     <Button
                         onClick={() => handleDelete(p.id)}
-                        variant="outlined"
+                        variant="contained"
                         color="error"
                         sx={{
                             border: '1px solid',

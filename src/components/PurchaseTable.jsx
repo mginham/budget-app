@@ -1,8 +1,10 @@
 import {
+    Paper,
     Typography,
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
 } from '../components/mui';
@@ -27,36 +29,38 @@ export default function PurchaseTable({
                 Logged Purchases
             </Typography>
 
-            <Table sx={{ tableLayout: 'fixed', minWidth: 650, maxWidth: 850, border: '1px solid', borderColor: 'divider' }}>
-                <TableHead>
-                    <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Purchase</b></TableCell>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Amount ($)</b></TableCell>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Payment Method</b></TableCell>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Line Item</b></TableCell>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Timestamp</b></TableCell>
-                        <TableCell align="center" sx={{ width: '15%' }}><b>Actions</b></TableCell>
-                    </TableRow>
-                </TableHead>
-                <TableBody>
-                    {purchases.length === 0 ? (
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
                         <TableRow>
-                            <TableCell colSpan={5} align="center">
-                                No purchases logged.
-                            </TableCell>
+                            <TableCell>Purchase</TableCell>
+                            <TableCell>Amount ($)</TableCell>
+                            <TableCell>Payment Method</TableCell>
+                            <TableCell>Line Item</TableCell>
+                            <TableCell>Timestamp</TableCell>
+                            <TableCell>Actions</TableCell>
                         </TableRow>
-                    ) : (
-                        purchases.map((p) => (
-                            <TableRow key={p.id}>
-                                {editingRowId === p.id
-                                    ? <EditableRow {...{ editingRowData, handleEditChange, handleSaveEdit, handleCancelEdit, budgets, paymentMethods }} />
-                                    : <StaticRow {...{ p, handleStartEdit, handleDelete, editingRowId }} />
-                                }
+                    </TableHead>
+                    <TableBody>
+                        {purchases.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} align="center">
+                                    No purchases logged.
+                                </TableCell>
                             </TableRow>
-                        ))
-                    )}
-                </TableBody>
-            </Table>
+                        ) : (
+                            purchases.map((p) => (
+                                <TableRow key={p.id}>
+                                    {editingRowId === p.id
+                                        ? <EditableRow {...{ editingRowData, handleEditChange, handleSaveEdit, handleCancelEdit, budgets, paymentMethods }} />
+                                        : <StaticRow {...{ p, handleStartEdit, handleDelete, editingRowId }} />
+                                    }
+                                </TableRow>
+                            ))
+                        )}
+                    </TableBody>
+                </Table>
+            </TableContainer>
         </>
     )
 }

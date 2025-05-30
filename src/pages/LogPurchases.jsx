@@ -13,6 +13,7 @@ import {
 import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
 import {
+    CircularProgress,
     Container,
     Typography,
     Grid,
@@ -48,6 +49,7 @@ export default function LogPurchases() {
     })
     const [editingRowId, setEditingRowId] = useState(null)
     const [editingRowData, setEditingRowData] = useState({})
+    const [loading, setLoading] = useState(true)
 
 
     // ============================
@@ -56,8 +58,14 @@ export default function LogPurchases() {
 
     useEffect(() => {
         if (!userId) return
-        fetchBudgets()
-        fetchPaymentMethods()
+
+        const fetchData = async () => {
+            await fetchBudgets()
+            await fetchPaymentMethods()
+            setLoading(false)
+        }
+
+        fetchData()
     }, [userId])
 
     const fetchBudgets = async () => {
@@ -201,62 +209,69 @@ export default function LogPurchases() {
                     Log Purchases
                 </Typography>
                 <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                    <Typography color="primary" sx={{ '&:hover': { textDecoration: 'underline' } }}>
+                    <Typography color="link" sx={{ '&:hover': { textDecoration: 'underline' } }}>
                         ← Back to Dashboard
                     </Typography>
                 </Link>
             </Grid>
 
-            {/* Alerts */}
-            {paymentMethods.length === 0 && (
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                    No saved payment methods. Please add some before logging purchases.
-                </Alert>
+            {/* Loading state */}
+            {loading ? (
+                <CircularProgress />
+            ) : (
+                <>
+                    {/* Alerts */}
+                    {paymentMethods.length === 0 && (
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            No saved payment methods. Please add some before logging purchases.
+                        </Alert>
+                    )}
+
+                    {budgets.length === 0 && (
+                        <Alert severity="warning" sx={{ mb: 2 }}>
+                            No budget line items. Please{' '}
+                            <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                edit your budget
+                            </Link>{' '}
+                            before logging purchases.
+                        </Alert>
+                    )}
+
+                    {/* New Purchase Form */}
+                    {budgets.length > 0 && (
+                        <PurchaseForm
+                            formData={formData}
+                            budgets={budgets}
+                            paymentMethods={paymentMethods}
+                            handleChange={handleChange}
+                            handleSubmit={handleSubmit}
+                        />
+                    )}
+
+                    {/* Payment Method Manager */}
+                    <Grid container justifyContent="right" alignItems="center" mb={3}>
+                        <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
+                            <Button variant="contained" color="link" sx={{ height: 50, fontWeight: "bold", color: '#FFFFFF' }}>
+                                Manage Payment Methods
+                            </Button>
+                        </Link>
+                    </Grid>
+
+                    {/* Logged Purchases Table */}
+                    <PurchaseTable
+                        purchases={purchases}
+                        editingRowId={editingRowId}
+                        editingRowData={editingRowData}
+                        handleEditChange={handleEditChange}
+                        handleSaveEdit={handleSaveEdit}
+                        handleCancelEdit={handleCancelEdit}
+                        handleStartEdit={handleStartEdit}
+                        handleDelete={handleDelete}
+                        budgets={budgets}
+                        paymentMethods={paymentMethods}
+                    />
+                </>
             )}
-
-            {budgets.length === 0 && (
-                <Alert severity="warning" sx={{ mb: 2 }}>
-                    No budget line items. Please{' '}
-                    <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
-                        edit your budget
-                    </Link>{' '}
-                    before logging purchases.
-                </Alert>
-            )}
-
-            {/* Payment Method Manager */}
-            <Grid container justifyContent="right" alignItems="center" mb={3}>
-                <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
-                    <Button variant="contained" color="primary">
-                        Manage Payment Methods
-                    </Button>
-                </Link>
-            </Grid>
-
-            {/* New Purchase Form */}
-            {budgets.length > 0 && (
-                <PurchaseForm
-                    formData={formData}
-                    budgets={budgets}
-                    paymentMethods={paymentMethods}
-                    handleChange={handleChange}
-                    handleSubmit={handleSubmit}
-                />
-            )}
-
-            {/* Logged Purchases Table */}
-            <PurchaseTable
-                purchases={purchases}
-                editingRowId={editingRowId}
-                editingRowData={editingRowData}
-                handleEditChange={handleEditChange}
-                handleSaveEdit={handleSaveEdit}
-                handleCancelEdit={handleCancelEdit}
-                handleStartEdit={handleStartEdit}
-                handleDelete={handleDelete}
-                budgets={budgets}
-                paymentMethods={paymentMethods}
-            />
         </Container>
     )
 }

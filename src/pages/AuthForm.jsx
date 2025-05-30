@@ -42,7 +42,10 @@ export default function AuthForm() {
             boxShadow={3}
             borderRadius={2}
             border={1}
-            borderColor="grey.300"
+            borderColor="#E0E0E0"
+            sx={{
+                backgroundColor: 'custom.boxBackground'
+            }}
         >
             <Typography variant="h5" fontWeight="bold" mb={3} textAlign="center">
                 {isRegistering ? "Register" : "Login"}
@@ -63,25 +66,21 @@ export default function AuthForm() {
 
                     <TextField
                         label="Email"
-                        variant="outlined"
                         type="email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        fullWidth
                     />
 
                     <TextField
                         label="Password"
-                        variant="outlined"
                         type="password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
-                        fullWidth
                     />
 
-                    <Button type="submit" variant="contained" color="primary" fullWidth>
+                    <Button type="submit" fullWidth>
                         {isRegistering ? "Register" : "Login"}
                     </Button>
                 </Box>
@@ -92,7 +91,6 @@ export default function AuthForm() {
                 <Button
                     onClick={() => setIsRegistering((prev) => !prev)}
                     variant="text"
-                    color="primary"
                     sx={{ textDecoration: "underline", minWidth: 0, padding: 0 }}
                 >
                     {isRegistering ? "Login" : "Register"}

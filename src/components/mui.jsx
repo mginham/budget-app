@@ -13,28 +13,69 @@ import {
     Paper,
     Select,
     Stack,
-    Table,
+    Table as MuiTable,
     TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
+    TableCell as MuiTableCell,
+    TableContainer as MuiTableContainer,
+    TableHead as MuiTableHead,
+    TableRow as MuiTableRow,
     TextField as MuiTextField,
     Typography,
 } from '@mui/material';
 
 export const Button = (props) => (
-    <MuiButton variant="contained" size="medium" color="primary" {...props} />
+    <MuiButton
+        {...props}
+    />
 )
 
 export const TextField = (props) => (
-    <MuiTextField variant="outlined" fullWidth size="small" {...props} />
+    <MuiTextField
+        {...props}
+    />
 )
 
 export const Container = ({ children, ...props }) => (
-    <MuiContainer maxWidth="md" sx={{ py: 4 }} {...props}>
+    <MuiContainer
+        {...props}
+    >
         {children}
     </MuiContainer>
+)
+
+export const Table = (props) => (
+    <MuiTable
+        {...props}
+    >
+    </MuiTable>
+)
+
+export const TableHead = (props) => (
+    <MuiTableHead
+        {...props}
+    >
+    </MuiTableHead>
+)
+
+export const TableRow = (props) => (
+    <MuiTableRow
+        {...props}
+    >
+    </MuiTableRow>
+)
+
+export const TableCell = (props) => (
+    <MuiTableCell
+        {...props}
+    >
+    </MuiTableCell>
+)
+
+export const TableContainer = (props) => (
+    <MuiTableContainer
+        {...props}
+    >
+    </MuiTableContainer>
 )
 
 // Re-export others unchanged
@@ -51,11 +92,6 @@ export {
     Paper,
     Select,
     Stack,
-    Table,
     TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
     Typography,
 }
