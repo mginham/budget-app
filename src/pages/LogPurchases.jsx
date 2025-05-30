@@ -17,6 +17,7 @@ import {
     Typography,
     Grid,
     Alert,
+    Button,
 } from "@mui/material"
 import PurchaseForm from "../components/PurchaseForm"
 import PurchaseTable from "../components/PurchaseTable"
@@ -222,6 +223,15 @@ export default function LogPurchases() {
                     before logging purchases.
                 </Alert>
             )}
+
+            {/* Payment Method Manager */}
+            <Grid container justifyContent="right" alignItems="center" mb={3}>
+                <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
+                    <Button variant="contained" color="primary">
+                        Manage Payment Methods
+                    </Button>
+                </Link>
+            </Grid>
 
             {/* New Purchase Form */}
             {budgets.length > 0 && (

@@ -9,6 +9,8 @@ import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'
 import LogPurchases from './pages/LogPurchases'
+import ManagePaymentMethods from './pages/ManagePaymentMethods';
+
 
 function App() {
     const setUser = useAuthStore((state) => state.setUser)
@@ -48,6 +50,14 @@ function App() {
                         element={
                             <ProtectedRoute>
                                 <LogPurchases />
+                            </ProtectedRoute>
+                        }
+                    />
+                    <Route
+                        path="/manage-payment-methods"
+                        element={
+                            <ProtectedRoute>
+                                <ManagePaymentMethods />
                             </ProtectedRoute>
                         }
                     />
