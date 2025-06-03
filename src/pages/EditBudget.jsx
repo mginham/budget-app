@@ -1,5 +1,5 @@
 import { Link as RouterLink } from "react-router-dom"
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { db, auth } from "../firebase"
 import {
     collection,
@@ -26,6 +26,7 @@ import {
     Stack,
     Link,
 } from '../components/mui';
+import AppLayout from '../components/layout/AppLayout';
 
 export default function EditBudget() {
     const user = useAuthStore((state) => state.user)
@@ -106,47 +107,91 @@ export default function EditBudget() {
     }
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            <Box
-                display="flex"
-                justifyContent="space-between"
-                alignItems="center"
-                mb={3}
-            >
-                <Typography variant="h4" component="h1" fontWeight="bold">
-                    Edit Budget
-                </Typography>
-                <Link
-                    component={RouterLink}
-                    to="/dashboard"
-                    underline="hover"
-                    color="link"
-                    sx={{ fontWeight: "medium" }}
-                >
-                    ← Back to Dashboard
-                </Link>
-            </Box>
+        <AppLayout title="Edit Budget">
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                <TableContainer component={Paper}>
+                    <Table>
+                        <TableHead sx={{ backgroundColor: "grey.100" }}>
+                            <TableRow>
+                                <TableCell>Item</TableCell>
+                                <TableCell>Assigned</TableCell>
+                                <TableCell>Expected Date</TableCell>
+                                <TableCell>Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
 
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead sx={{ backgroundColor: "grey.100" }}>
-                        <TableRow>
-                            <TableCell>Item</TableCell>
-                            <TableCell>Assigned</TableCell>
-                            <TableCell>Expected Date</TableCell>
-                            <TableCell>Actions</TableCell>
-                        </TableRow>
-                    </TableHead>
+                        <TableBody>
+                            {budgets.map((item) => (
+                                <TableRow key={item.id} hover>
+                                    <TableCell>
+                                        <TextField
+                                            value={item.lineItem}
+                                            onChange={(e) =>
+                                                handleInputChange(item.id, "lineItem", e.target.value)
+                                            }
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            type="number"
+                                            value={item.spendingLimit}
+                                            onChange={(e) =>
+                                                handleInputChange(item.id, "spendingLimit", e.target.value)
+                                            }
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            inputProps={{ min: 0, step: 0.01 }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <TextField
+                                            type="date"
+                                            value={item.expectedDate || ""}
+                                            onChange={(e) =>
+                                                handleInputChange(item.id, "expectedDate", e.target.value)
+                                            }
+                                            variant="outlined"
+                                            size="small"
+                                            fullWidth
+                                            InputLabelProps={{ shrink: true }}
+                                        />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Stack direction="row" spacing={1}>
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                size="small"
+                                                onClick={() => handleSave(item.id, item)}
+                                            >
+                                                Save
+                                            </Button>
+                                            <Button
+                                                variant="contained"
+                                                color="error"
+                                                size="small"
+                                                onClick={() => handleDelete(item.id)}
+                                            >
+                                                Delete
+                                            </Button>
+                                        </Stack>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
 
-                    <TableBody>
-                        {budgets.map((item) => (
-                            <TableRow key={item.id} hover>
+                            {/* Add New Line Item */}
+                            <TableRow sx={{ backgroundColor: "yellow.50" }}>
                                 <TableCell>
                                     <TextField
-                                        value={item.lineItem}
+                                        value={newLineItem.lineItem}
                                         onChange={(e) =>
-                                            handleInputChange(item.id, "lineItem", e.target.value)
+                                            setNewLineItem({ ...newLineItem, lineItem: e.target.value })
                                         }
+                                        placeholder="New item"
                                         variant="outlined"
                                         size="small"
                                         fullWidth
@@ -155,10 +200,11 @@ export default function EditBudget() {
                                 <TableCell>
                                     <TextField
                                         type="number"
-                                        value={item.spendingLimit}
+                                        value={newLineItem.spendingLimit}
                                         onChange={(e) =>
-                                            handleInputChange(item.id, "spendingLimit", e.target.value)
+                                            setNewLineItem({ ...newLineItem, spendingLimit: e.target.value })
                                         }
+                                        placeholder="Budgeted"
                                         variant="outlined"
                                         size="small"
                                         fullWidth
@@ -168,9 +214,9 @@ export default function EditBudget() {
                                 <TableCell>
                                     <TextField
                                         type="date"
-                                        value={item.expectedDate || ""}
+                                        value={newLineItem.expectedDate}
                                         onChange={(e) =>
-                                            handleInputChange(item.id, "expectedDate", e.target.value)
+                                            setNewLineItem({ ...newLineItem, expectedDate: e.target.value })
                                         }
                                         variant="outlined"
                                         size="small"
@@ -179,84 +225,21 @@ export default function EditBudget() {
                                     />
                                 </TableCell>
                                 <TableCell>
-                                    <Stack direction="row" spacing={1}>
-                                        <Button
-                                            variant="contained"
-                                            color="success"
-                                            size="small"
-                                            onClick={() => handleSave(item.id, item)}
-                                        >
-                                            Save
-                                        </Button>
-                                        <Button
-                                            variant="contained"
-                                            color="error"
-                                            size="small"
-                                            onClick={() => handleDelete(item.id)}
-                                        >
-                                            Delete
-                                        </Button>
-                                    </Stack>
+                                    <Button
+                                        onClick={handleAdd}
+                                        variant="contained"
+                                        color="primary"
+                                        size="small"
+                                        disabled={!userId}
+                                    >
+                                        Add
+                                    </Button>
                                 </TableCell>
                             </TableRow>
-                        ))}
-
-                        {/* Add New Line Item */}
-                        <TableRow sx={{ backgroundColor: "yellow.50" }}>
-                            <TableCell>
-                                <TextField
-                                    value={newLineItem.lineItem}
-                                    onChange={(e) =>
-                                        setNewLineItem({ ...newLineItem, lineItem: e.target.value })
-                                    }
-                                    placeholder="New item"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    type="number"
-                                    value={newLineItem.spendingLimit}
-                                    onChange={(e) =>
-                                        setNewLineItem({ ...newLineItem, spendingLimit: e.target.value })
-                                    }
-                                    placeholder="Budgeted"
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    inputProps={{ min: 0, step: 0.01 }}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <TextField
-                                    type="date"
-                                    value={newLineItem.expectedDate}
-                                    onChange={(e) =>
-                                        setNewLineItem({ ...newLineItem, expectedDate: e.target.value })
-                                    }
-                                    variant="outlined"
-                                    size="small"
-                                    fullWidth
-                                    InputLabelProps={{ shrink: true }}
-                                />
-                            </TableCell>
-                            <TableCell>
-                                <Button
-                                    onClick={handleAdd}
-                                    variant="contained"
-                                    color="primary"
-                                    size="small"
-                                    disabled={!userId}
-                                >
-                                    Add
-                                </Button>
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Container>
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </Container>
+        </AppLayout>
     )
 }
