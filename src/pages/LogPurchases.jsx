@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { db } from "../firebase"
 import {
     collection,
@@ -22,6 +22,7 @@ import {
 } from '../components/mui';
 import PurchaseForm from "../components/PurchaseForm"
 import PurchaseTable from "../components/PurchaseTable"
+import AppLayout from '../components/layout/AppLayout';
 
 export default function LogPurchases() {
 
@@ -202,76 +203,66 @@ export default function LogPurchases() {
     // ============================
 
     return (
-        <Container maxWidth="md" sx={{ py: 4 }}>
-            {/* Header */}
-            <Grid container justifyContent="space-between" alignItems="center" mb={3}>
-                <Typography variant="h4" fontWeight="bold">
-                    Log Purchases
-                </Typography>
-                <Link to="/dashboard" style={{ textDecoration: 'none' }}>
-                    <Typography color="link" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-                        ← Back to Dashboard
-                    </Typography>
-                </Link>
-            </Grid>
+        <AppLayout title="Log Purchases">
+            <Container maxWidth="md" sx={{ py: 4 }}>
+                {/* Loading state */}
+                {loading ? (
+                    <CircularProgress />
+                ) : (
+                    <>
+                        {/* Alerts */}
+                        {paymentMethods.length === 0 && (
+                            <Alert severity="warning" sx={{ mb: 2 }}>
+                                No saved payment methods. Please add some before logging purchases.
+                            </Alert>
+                        )}
 
-            {/* Loading state */}
-            {loading ? (
-                <CircularProgress />
-            ) : (
-                <>
-                    {/* Alerts */}
-                    {paymentMethods.length === 0 && (
-                        <Alert severity="warning" sx={{ mb: 2 }}>
-                            No saved payment methods. Please add some before logging purchases.
-                        </Alert>
-                    )}
+                        {budgets.length === 0 && (
+                            <Alert severity="warning" sx={{ mb: 2 }}>
+                                No budget line items. Please{' '}
+                                <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                    edit your budget
+                                </Link>{' '}
+                                before logging purchases.
+                            </Alert>
+                        )}
 
-                    {budgets.length === 0 && (
-                        <Alert severity="warning" sx={{ mb: 2 }}>
-                            No budget line items. Please{' '}
-                            <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
-                                edit your budget
-                            </Link>{' '}
-                            before logging purchases.
-                        </Alert>
-                    )}
+                        {/* New Purchase Form */}
+                        {budgets.length > 0 && (
+                            <PurchaseForm
+                                formData={formData}
+                                budgets={budgets}
+                                paymentMethods={paymentMethods}
+                                handleChange={handleChange}
+                                handleSubmit={handleSubmit}
+                            />
+                        )}
 
-                    {/* New Purchase Form */}
-                    {budgets.length > 0 && (
-                        <PurchaseForm
-                            formData={formData}
+                        {/* Payment Method Manager */}
+                        <Grid container justifyContent="right" alignItems="center" mb={3}>
+                            <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
+                                <Button variant="contained" color="link" sx={{ height: 50, fontWeight: "bold", color: '#FFFFFF' }}>
+                                    Manage Payment Methods
+                                </Button>
+                            </Link>
+                        </Grid>
+
+                        {/* Logged Purchases Table */}
+                        <PurchaseTable
+                            purchases={purchases}
+                            editingRowId={editingRowId}
+                            editingRowData={editingRowData}
+                            handleEditChange={handleEditChange}
+                            handleSaveEdit={handleSaveEdit}
+                            handleCancelEdit={handleCancelEdit}
+                            handleStartEdit={handleStartEdit}
+                            handleDelete={handleDelete}
                             budgets={budgets}
                             paymentMethods={paymentMethods}
-                            handleChange={handleChange}
-                            handleSubmit={handleSubmit}
                         />
-                    )}
-
-                    {/* Payment Method Manager */}
-                    <Grid container justifyContent="right" alignItems="center" mb={3}>
-                        <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
-                            <Button variant="contained" color="link" sx={{ height: 50, fontWeight: "bold", color: '#FFFFFF' }}>
-                                Manage Payment Methods
-                            </Button>
-                        </Link>
-                    </Grid>
-
-                    {/* Logged Purchases Table */}
-                    <PurchaseTable
-                        purchases={purchases}
-                        editingRowId={editingRowId}
-                        editingRowData={editingRowData}
-                        handleEditChange={handleEditChange}
-                        handleSaveEdit={handleSaveEdit}
-                        handleCancelEdit={handleCancelEdit}
-                        handleStartEdit={handleStartEdit}
-                        handleDelete={handleDelete}
-                        budgets={budgets}
-                        paymentMethods={paymentMethods}
-                    />
-                </>
-            )}
-        </Container>
+                    </>
+                )}
+            </Container>
+        </AppLayout>
     )
 }

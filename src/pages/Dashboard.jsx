@@ -1,6 +1,6 @@
 import { useAuthStore } from '../store/authStore'
 import { Link as RouterLink } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import {
@@ -22,12 +22,15 @@ import {
 } from '../components/mui';
 import MenuIcon from '@mui/icons-material/Menu';
 import Logout from '@mui/icons-material/Logout';
+import AppLayout from '../components/layout/AppLayout';
 
 
 export default function Dashboard() {
     // Retrieve user and logout info from auth store
     const { user, logout } = useAuthStore()
     const userId = user?.uid
+
+    const title = `Welcome, ${user?.displayName || user?.email}!`;
 
     const [budgets, setBudgets] = useState([])
     const [loading, setLoading] = useState(true)
@@ -66,7 +69,7 @@ export default function Dashboard() {
     }, [userId])
 
     return (
-        <>
+        <AppLayout title={title}>
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
                 Your Budget
             </Typography>
@@ -97,6 +100,6 @@ export default function Dashboard() {
                     </TableBody>
                 </Table>
             )}
-        </>
+        </AppLayout>
     )
 }

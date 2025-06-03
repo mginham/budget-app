@@ -7,7 +7,7 @@ import EditBudget from './pages/EditBudget'
 import LogPurchases from './pages/LogPurchases'
 import ManagePaymentMethods from './pages/ManagePaymentMethods';
 
-import { useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'
@@ -33,29 +33,21 @@ function App() {
 
                     {/* Protected routes with shared layout */}
                     <Route
-                        element={
-                            <ProtectedRoute>
-                                <AppLayout />
-                            </ProtectedRoute>
-                        }
-                    >
-                        <Route
-                            path="/dashboard"
-                            element={ <Dashboard /> }
-                        />
-                        <Route
-                            path="/edit-budget"
-                            element={ <EditBudget /> }
-                        />
-                        <Route
-                            path="/log-purchases"
-                            element={ <LogPurchases /> }
-                        />
-                        <Route
-                            path="/manage-payment-methods"
-                            element={ <ManagePaymentMethods /> }
-                        />
-                    </Route>
+                        path="/dashboard"
+                        element={ <ProtectedRoute><Dashboard /></ProtectedRoute> }
+                    />
+                    <Route
+                        path="/edit-budget"
+                        element={ <ProtectedRoute><EditBudget /></ProtectedRoute> }
+                    />
+                    <Route
+                        path="/log-purchases"
+                        element={ <ProtectedRoute><LogPurchases /></ProtectedRoute> }
+                    />
+                    <Route
+                        path="/manage-payment-methods"
+                        element={ <ProtectedRoute><ManagePaymentMethods /></ProtectedRoute> }
+                    />
 
                     {/* Catch-all */}
                     <Route path="*" element={<AuthForm />} />

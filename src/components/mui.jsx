@@ -1,4 +1,5 @@
 import {
+    AppBar,
     Alert,
     Box,
     Breadcrumbs,
@@ -24,6 +25,7 @@ import {
     TableHead as MuiTableHead,
     TableRow as MuiTableRow,
     TextField as MuiTextField,
+    Toolbar,
     Typography,
 } from '@mui/material';
 
@@ -84,6 +86,7 @@ export const TableContainer = (props) => (
 
 // Re-export others unchanged
 export {
+    AppBar,
     Alert,
     Box,
     Breadcrumbs,
@@ -101,5 +104,6 @@ export {
     Select,
     Stack,
     TableBody,
+    Toolbar,
     Typography,
 }
