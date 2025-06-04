@@ -204,7 +204,7 @@ export default function LogPurchases() {
 
     return (
         <AppLayout title="Log Purchases">
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
                 {/* Loading state */}
                 {loading ? (
                     <CircularProgress />
