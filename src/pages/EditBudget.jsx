@@ -108,8 +108,8 @@ export default function EditBudget() {
 
     return (
         <AppLayout title="Edit Budget">
-            <Container maxWidth="md" sx={{ py: 4 }}>
-                <TableContainer component={Paper}>
+            <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
+                <TableContainer component={Paper} sx={{ width: '100%' }}>
                     <Table>
                         <TableHead sx={{ backgroundColor: "grey.100" }}>
                             <TableRow>

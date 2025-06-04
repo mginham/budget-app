@@ -13,7 +13,7 @@ import AppLayout from '../components/layout/AppLayout';
 export default function ManagePaymentMethods() {
     return (
         <AppLayout title="Manage Payment Methods">
-            <Container maxWidth="md" sx={{ py: 4 }}>
+            <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
                 {/* Breadcrumbs */}
                 {/* <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 2 }}>
                     <Link to="/log-purchases" style={{ textDecoration: 'none', color: 'blue' }}>
@@ -23,10 +23,10 @@ export default function ManagePaymentMethods() {
                 </Breadcrumbs> */}
 
                 {/* Form */}
+                <Typography variant="h5" fontWeight="semiBold" mb={2}>
+                    New Payment Method
+                </Typography>
                 <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
-                    <Typography variant="h4" mb={3}>
-                        New Payment Method
-                    </Typography>
                     <PaymentMethodManager />
                 </Paper>
             </Container>

@@ -32,7 +32,8 @@ export default function AppLayout({ title, children }) {
                 elevation={0}
                 sx={{
                     backgroundColor: 'transparent',
-                    color: 'inherit'
+                    color: 'inherit',
+                    mt: 2,
                 }}
             >
                 <Toolbar>
@@ -83,21 +84,9 @@ export default function AppLayout({ title, children }) {
                     </Menu>
                 </Toolbar>
             </AppBar>
-            <Box p={4} maxWidth={800} mx="auto">
+            <Box p={4} maxWidth={800} mx="auto"> {/* TODO: delete border */}
                 {children}
             </Box>
         </>
-        // <Box p={4} maxWidth={800} mx="auto">
-        //     <Stack direction="row" spacing={2} mb={3} justifyContent="space-between">
-        //         <Typography variant="h4" fontWeight="bold" mb={3}>
-        //             Welcome, {user?.displayName || user?.email}!
-        //         </Typography>
-        //         <IconButton onClick={handleMenuOpen}>
-        //             <MenuIcon fontSize="large" />
-        //         </IconButton>
-        //     </Stack>
-
-        //     <Outlet />
-        // </Box>
     )
 }
