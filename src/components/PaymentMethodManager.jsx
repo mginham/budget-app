@@ -8,7 +8,9 @@ import {
     TableRow,
     Button,
     TextField,
-    Stack
+    Stack,
+    Paper,
+    Typography,
 } from '../components/mui';
 import {
     addPaymentMethod,
@@ -71,34 +73,38 @@ export default function PaymentMethodManager() {
     }
 
     return (
-        <Stack spacing={2}>
-            <Stack direction="row" spacing={2}>
-                <TextField
-                    label="Payment Method"
-                    value={newFormData.name}
-                    onChange={(e) => setNewFormData({ name: e.target.value })}
-                />
-                <Button variant="contained" onClick={handleAdd}>
-                    Add
-                </Button>
-                {editId && (
-                    <Button variant="outlined" color="secondary" onClick={handleEditCancel}>
-                        Cancel
+        // <Stack spacing={2}>
+        <>
+            <Paper elevation={3} sx={{ p: 4, mb: 4, borderRadius: 2 }}>
+                <Typography variant="h5" fontWeight="semiBold" mb={2}>
+                    New Payment Method
+                </Typography>
+                <Stack direction="row" spacing={2}>
+                    <TextField
+                        label="Payment Method"
+                        value={newFormData.name}
+                        onChange={(e) => setNewFormData({ name: e.target.value })}
+                    />
+                    <Button variant="contained" onClick={handleAdd}>
+                        Add
                     </Button>
-                )}
-            </Stack>
+                </Stack>
+            </Paper>
 
+            <Typography variant="h5" fontWeight="semiBold" mb={2}>
+                Logged Payment Methods
+            </Typography>
             <Table>
                 <TableHead>
                     <TableRow>
-                        <TableCell>Name</TableCell>
-                        <TableCell>Actions</TableCell>
+                        <TableCell align="center">Name</TableCell>
+                        <TableCell align="center">Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
                     {methods.map((method) => (
                         <TableRow key={method.id}>
-                            <TableCell>
+                            <TableCell align="center">
                                 {editId === method.id ? (
                                     <TextField
                                         value={editFormData.name}
@@ -106,25 +112,28 @@ export default function PaymentMethodManager() {
                                             setEditFormData({ name: e.target.value })
                                         }
                                         size="small"
+                                        fullWidth
                                     />
                                 ) : (
                                     method.name
                                 )}
                             </TableCell>
-                            <TableCell>
-                                <Stack direction="row" spacing={1}>
+                            <TableCell align="center">
+                                <Stack direction="row" spacing={1} justifyContent="center">
+                                    {/* TODO: Disable other buttons when editing */}
                                     {editId === method.id ? (
                                         <>
                                             <Button
                                                 onClick={() => handleEditSave(method.id)}
                                                 variant="contained"
+                                                color="success"
                                                 size="small"
                                             >
                                                 Save
                                             </Button>
                                             <Button
                                                 onClick={handleEditCancel}
-                                                variant="outlined"
+                                                variant="contained"
                                                 size="small"
                                                 color="secondary"
                                             >
@@ -134,14 +143,14 @@ export default function PaymentMethodManager() {
                                     ) : (
                                         <>
                                             <Button
-                                                variant="outlined"
+                                                variant="contained"
                                                 size="small"
                                                 onClick={() => handleEditClick(method)}
                                             >
                                                 Edit
                                             </Button>
                                             <Button
-                                                variant="outlined"
+                                                variant="contained"
                                                 color="error"
                                                 size="small"
                                                 onClick={() => deletePaymentMethod(method.id)}
@@ -156,6 +165,7 @@ export default function PaymentMethodManager() {
                     ))}
                 </TableBody>
             </Table>
-        </Stack>
+        </>
+        // </Stack>
     )
 }
