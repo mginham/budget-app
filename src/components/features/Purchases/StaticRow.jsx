@@ -1,7 +1,7 @@
 import {
     Button,
-    TableCell,
     Stack,
+    TableCell,
 } from '../../mui';
 
 export default function StaticRow({

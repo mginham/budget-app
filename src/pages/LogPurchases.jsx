@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import { db } from "../firebase"
 import {
     collection,
@@ -13,11 +13,11 @@ import {
 import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
 import {
+    Alert,
+    Button,
     CircularProgress,
     Container,
     Grid,
-    Alert,
-    Button,
 } from '../components/mui';
 import PurchaseForm from "../components/features/Purchases/PurchaseForm"
 import PurchaseTable from "../components/features/Purchases/PurchaseTable"
@@ -25,18 +25,12 @@ import AppLayout from '../components/layout/AppLayout';
 
 export default function LogPurchases() {
 
-    // ============================
     // User Auth & Firestore Hooks
-    // ============================
-
     const user = useAuthStore((state) => state.user)
     const userId = user?.uid
 
 
-    // ============================
     // State Variables
-    // ============================
-
     const [budgets, setBudgets] = useState([])
     const [paymentMethods, setPaymentMethods] = useState([])
     const [purchases, setPurchases] = useState([])
@@ -52,9 +46,7 @@ export default function LogPurchases() {
     const [loading, setLoading] = useState(true)
 
 
-    // ============================
     // Fetch Firestore Data
-    // ============================
 
     useEffect(() => {
         if (!userId) return
@@ -88,7 +80,7 @@ export default function LogPurchases() {
 
     // Real-time listener for purchases
     useEffect(() => {
-        if (!userId) return;
+        if (!userId) return
 
         const unsubscribe = onSnapshot(
             collection(db, "users", userId, "purchases"),
@@ -104,9 +96,7 @@ export default function LogPurchases() {
     }, [userId])
 
 
-    // ============================
     // Form Handlers
-    // ============================
 
     const handleChange = (e) => {
         const { name, value } = e.target
@@ -148,9 +138,7 @@ export default function LogPurchases() {
     }
 
 
-    // ============================
     // Edit & Delete Handlers
-    // ============================
 
     const handleStartEdit = (purchase) => {
         setEditingRowId(purchase.id)
@@ -197,10 +185,7 @@ export default function LogPurchases() {
     }
 
 
-    // ============================
     // UI Components
-    // ============================
-
     return (
         <AppLayout title="Log Purchases">
             <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
@@ -210,32 +195,33 @@ export default function LogPurchases() {
                 ) : (
                     <>
                         {/* Alerts */}
-                        {paymentMethods.length === 0 && (
-                            <Alert severity="warning" sx={{ mb: 2 }}>
-                                No saved payment methods. Please add some before logging purchases.
-                            </Alert>
-                        )}
-
                         {budgets.length === 0 && (
                             <Alert severity="warning" sx={{ mb: 2 }}>
                                 No budget line items. Please{' '}
                                 <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
                                     edit your budget
-                                </Link>{' '}
-                                before logging purchases.
+                                </Link>
+                                {' '}before logging purchases.
+                            </Alert>
+                        )}
+                        {paymentMethods.length === 0 && (
+                            <Alert severity="warning" sx={{ mb: 2 }}>
+                                No saved payment methods. Please{' '}
+                                <Link to="/manage-payment-methods" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                                    add payment methods
+                                </Link>
+                                 {' '}before logging purchases.
                             </Alert>
                         )}
 
                         {/* New Purchase Form */}
-                        {budgets.length > 0 && (
-                            <PurchaseForm
-                                formData={formData}
-                                budgets={budgets}
-                                paymentMethods={paymentMethods}
-                                handleChange={handleChange}
-                                handleSubmit={handleSubmit}
-                            />
-                        )}
+                        <PurchaseForm
+                            formData={formData}
+                            budgets={budgets}
+                            paymentMethods={paymentMethods}
+                            handleChange={handleChange}
+                            handleSubmit={handleSubmit}
+                        />
 
                         {/* Payment Method Manager */}
                         <Grid container justifyContent="right" alignItems="center" mb={3}>

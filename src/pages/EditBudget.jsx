@@ -1,6 +1,5 @@
-import { Link as RouterLink } from "react-router-dom"
-import React, { useEffect, useState } from "react"
-import { db, auth } from "../firebase"
+import { useEffect, useState } from "react"
+import { db } from "../firebase"
 import {
     collection,
     getDocs,
@@ -11,46 +10,59 @@ import {
 } from "firebase/firestore"
 import { useAuthStore } from "../store/authStore"
 import {
-    Box,
     Button,
+    CircularProgress,
     Container,
-    TextField,
-    Typography,
+    Paper,
+    Stack,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
-    Paper,
-    Stack,
-    Link,
+    TextField,
+    Typography,
 } from '../components/mui';
 import AppLayout from '../components/layout/AppLayout';
 
 export default function EditBudget() {
+
+    // User Auth & Firestore Hooks
     const user = useAuthStore((state) => state.user)
     const userId = user?.uid
 
+
+    // State Variables
     const [budgets, setBudgets] = useState([])
     const [newLineItem, setNewLineItem] = useState({
         lineItem: "",
         spendingLimit: "",
         expectedDate: ""
     })
+    const [loading, setLoading] = useState(true)
+
 
     // PREVENT loading if user is not ready yet
     if (!userId) return <Typography>Loading...</Typography>
 
-    useEffect(() => {
-        if (!userId) return // Wait for auth
 
-        fetchBudgets(userId)
+    // Fetch Firestore Data
+
+    useEffect(() => {
+        if (!userId) return
+
+        const fetchData = async () => {
+            await fetchBudgets()
+            setLoading(false)
+        }
+
+
+        fetchData()
     }, [userId])
 
-    const fetchBudgets = async (uid) => {
-        const budgetRef = collection(db, "users", uid, "budgets")
-        const snapshot = await getDocs(budgetRef)
+    const fetchBudgets = async () => {
+        const snapshot = await getDocs(collection(db, "users", userId, "budgets"))
         const data = snapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data()
@@ -109,9 +121,12 @@ export default function EditBudget() {
     return (
         <AppLayout title="Edit Budget">
             <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
-                <TableContainer component={Paper} sx={{ width: '100%' }}>
-                    {/* TODO: Add Loading state */}
-                        <>
+                {/* Loading state */}
+                {loading ? (
+                    <CircularProgress />
+                ) : (
+                    <>
+                        <TableContainer component={Paper} sx={{ width: '100%' }}>
                             <Table>
                                 <TableHead sx={{ backgroundColor: "grey.100" }}>
                                     <TableRow>
@@ -240,8 +255,9 @@ export default function EditBudget() {
                                     </TableRow>
                                 </TableBody>
                             </Table>
-                        </>
-                </TableContainer>
+                        </TableContainer>
+                    </>
+                )}
             </Container>
         </AppLayout>
     )

@@ -1,10 +1,10 @@
 import {
-    TextField,
-    Select,
-    MenuItem,
     Button,
-    TableCell,
+    MenuItem,
+    Select,
     Stack,
+    TableCell,
+    TextField,
 } from '../../mui';
 
 export default function EditableRow({

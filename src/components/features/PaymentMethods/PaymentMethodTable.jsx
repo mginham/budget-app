@@ -1,15 +1,15 @@
 import {
     Button,
+    Paper,
     Stack,
     Table,
     TableBody,
     TableCell,
+    TableContainer,
     TableHead,
     TableRow,
     TextField,
     Typography,
-    TableContainer,
-    Paper,
 } from '../../mui';
 import { useState } from 'react';
 
@@ -54,7 +54,7 @@ export default function PaymentMethodTable({ methods, onUpdate, onDelete, loadin
                         {methods.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={2} align="center">
-                                    No purchases logged.
+                                    No payment methods logged.
                                 </TableCell>
                             </TableRow>
                         ) : (

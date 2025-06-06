@@ -1,13 +1,12 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AuthForm from './pages/AuthForm'
-import AppLayout from './components/layout/AppLayout'
 import Dashboard from './pages/Dashboard'
 import EditBudget from './pages/EditBudget'
 import LogPurchases from './pages/LogPurchases'
 import ManagePaymentMethods from './pages/ManagePaymentMethods';
 
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { auth } from './firebase'
 import { useAuthStore } from './store/authStore'

@@ -3,14 +3,13 @@ import { useAuthStore } from '../../store/authStore'
 import {
     AppBar,
     Box,
+    Divider,
     IconButton,
+    ListItemIcon,
     Menu,
     MenuItem,
-    Typography,
     Toolbar,
-    Divider,
-    ListItemIcon,
-    Stack,
+    Typography,
 } from '../../components/mui'
 import MenuIcon from '@mui/icons-material/Menu'
 import LogoutIcon from '@mui/icons-material/Logout'

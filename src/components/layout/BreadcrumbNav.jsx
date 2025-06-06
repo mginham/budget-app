@@ -1,7 +1,7 @@
 import {
     Breadcrumbs,
+    Link,
     Typography,
-    Link
 } from '../components/mui';
 import { Link as RouterLink } from 'react-router-dom';
 

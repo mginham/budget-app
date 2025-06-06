@@ -1,12 +1,12 @@
 import {
     Paper,
-    Typography,
     Table,
     TableBody,
     TableCell,
     TableContainer,
     TableHead,
     TableRow,
+    Typography,
 } from '../../../components/mui';
 import EditableRow from "./EditableRow"
 import StaticRow from "./StaticRow"
@@ -43,7 +43,7 @@ export default function PurchaseTable({
                     <TableBody>
                         {purchases.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} align="center">
+                                <TableCell colSpan={6} align="center">
                                     No purchases logged.
                                 </TableCell>
                             </TableRow>
