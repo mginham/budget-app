@@ -7,7 +7,7 @@ import {
     TableContainer,
     TableHead,
     TableRow,
-} from '../components/mui';
+} from '../../../components/mui';
 import EditableRow from "./EditableRow"
 import StaticRow from "./StaticRow"
 
@@ -28,7 +28,6 @@ export default function PurchaseTable({
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
                 Logged Purchases
             </Typography>
-
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>

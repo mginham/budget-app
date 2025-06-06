@@ -15,13 +15,12 @@ import { Link } from "react-router-dom"
 import {
     CircularProgress,
     Container,
-    Typography,
     Grid,
     Alert,
     Button,
 } from '../components/mui';
-import PurchaseForm from "../components/PurchaseForm"
-import PurchaseTable from "../components/PurchaseTable"
+import PurchaseForm from "../components/features/Purchases/PurchaseForm"
+import PurchaseTable from "../components/features/Purchases/PurchaseTable"
 import AppLayout from '../components/layout/AppLayout';
 
 export default function LogPurchases() {

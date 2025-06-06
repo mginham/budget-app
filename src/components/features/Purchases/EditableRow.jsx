@@ -5,7 +5,7 @@ import {
     Button,
     TableCell,
     Stack,
-} from '../components/mui';
+} from '../../mui';
 
 export default function EditableRow({
     editingRowData,
