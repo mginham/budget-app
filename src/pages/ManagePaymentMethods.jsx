@@ -11,6 +11,7 @@ import {
     deletePaymentMethod,
     subscribeToPaymentMethods
 } from '../services/paymentMethodService'
+import { hasPurchasesForPaymentMethod } from '../services/purchaseService'
 import { useAuthStore } from "../store/authStore"
 
 export default function ManagePaymentMethods() {
@@ -23,6 +24,7 @@ export default function ManagePaymentMethods() {
     // State Variables
     const [methods, setMethods] = useState([])
     const [loading, setLoading] = useState(true)
+    const [usedMethods, setUsedMethods] = useState(new Set()) // track methods used in purchases
 
 
     // Fetch Firestore Data
@@ -30,10 +32,20 @@ export default function ManagePaymentMethods() {
     useEffect(() => {
         if (!userId) return
 
-        const unsubscribePaymentMethods = subscribeToPaymentMethods((snapshot) => {
+        const unsubscribePaymentMethods = subscribeToPaymentMethods(async (snapshot) => {
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
             setMethods(data)
             setLoading(false)
+
+            // Check which methods are used in purchases
+            const usedSet = new Set()
+            for (const method of data) {
+                const isUsed = await hasPurchasesForPaymentMethod(method.id)
+                if (isUsed) {
+                    usedSet.add(method.id)
+                }
+            }
+            setUsedMethods(usedSet)
         })
 
         return () => unsubscribePaymentMethods()
@@ -51,6 +63,10 @@ export default function ManagePaymentMethods() {
     }
 
     const handleDelete = async (id) => {
+        if (usedMethods.has(id)) {
+            alert("Cannot delete this payment method. It is used in logged purchases.")
+            return
+        }
         await deletePaymentMethod(id)
     }
 
@@ -67,6 +83,7 @@ export default function ManagePaymentMethods() {
                         {/* Table */}
                         <PaymentMethodTable
                             methods={methods}
+                            usedMethods={usedMethods}
                             onAdd={handleAdd}
                             onUpdate={handleUpdate}
                             onDelete={handleDelete}

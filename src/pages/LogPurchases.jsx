@@ -39,7 +39,8 @@ export default function LogPurchases() {
         purchase: "",
         amount: "",
         lineItem: "",
-        paymentMethod: ""
+        paymentMethodId: "",
+        paymentMethodName: "",
     })
     const [editingRowId, setEditingRowId] = useState(null)
     const [editingRowData, setEditingRowData] = useState({})
@@ -100,15 +101,28 @@ export default function LogPurchases() {
 
     const handleChange = (e) => {
         const { name, value } = e.target
-        setFormData((prev) => ({ ...prev, [name]: value }))
+
+        if (name === 'paymentMethodId') {
+            const selectedMethod = paymentMethods.find((m) => m.id === value)
+            setFormData((prevData) => ({
+                ...prevData,
+                paymentMethodId: value,
+                paymentMethodName: selectedMethod ? selectedMethod.name : '',
+            }))
+        } else {
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }))
+        }
     }
 
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        const { purchase, amount, lineItem, paymentMethod } = formData
+        const { purchase, amount, lineItem, paymentMethodId, paymentMethodName } = formData
 
-        if (!purchase || !amount || !lineItem || !paymentMethod) {
+        if (!purchase || !amount || !lineItem || !paymentMethodId) {
             alert("Please fill in all required fields.")
             return
         }
@@ -118,9 +132,12 @@ export default function LogPurchases() {
             : Timestamp.now()
 
         const newPurchase = {
-            ...formData,
+            purchase,
+            amount: parseFloat(amount),
+            lineItem,
             timestamp,
-            amount: parseFloat(amount)
+            paymentMethodId,
+            paymentMethodName
         }
 
         try {
@@ -130,7 +147,8 @@ export default function LogPurchases() {
                 purchase: "",
                 amount: "",
                 lineItem: "",
-                paymentMethod: ""
+                paymentMethodId: "",
+                paymentMethodName: ""
             })
         } catch (err) {
             console.error("Error logging purchase:", err)

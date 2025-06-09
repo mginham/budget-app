@@ -58,13 +58,13 @@ export default function PurchaseForm({
                             <InputLabel id="payment-method-label">Payment Method</InputLabel>
                             <Select
                                 labelId="payment-method-label"
-                                name="paymentMethod"
-                                value={formData.paymentMethod}
+                                name="paymentMethodId"
+                                value={formData.paymentMethodId || ''}
                                 onChange={handleChange}
                                 label="Payment Method"
                             >
                                 {paymentMethods.map((method) => (
-                                    <MenuItem key={method.id} value={method.name}>
+                                    <MenuItem key={method.id} value={method.id}>
                                         {method.name}
                                     </MenuItem>
                                 ))}

@@ -1,5 +1,6 @@
 import {
     Button,
+    CircularProgress,
     Paper,
     Stack,
     Table,
@@ -13,10 +14,11 @@ import {
 } from '../../mui';
 import { useState } from 'react';
 
-export default function PaymentMethodTable({ methods, onAdd, onUpdate, onDelete, loading }) {
+export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpdate, onDelete, loading }) {
     const [editId, setEditId] = useState(null)
     const [editFormData, setEditFormData] = useState({ name: '' })
     const [newMethodName, setNewMethodName] = useState('')
+    const [adding, setAdding] = useState(false)
 
     const startEdit = (method) => {
         setEditId(method.id)
@@ -36,8 +38,13 @@ export default function PaymentMethodTable({ methods, onAdd, onUpdate, onDelete,
 
     const handleAddNew = async () => {
         if (!newMethodName.trim()) return
-        await onAdd({ name: newMethodName })
-        setNewMethodName('')  // Clear after add
+        try {
+            setAdding(true)   // start spinner
+            await onAdd({ name: newMethodName })
+            setNewMethodName('')  // clear field
+        } finally {
+            setAdding(false)  // always stop spinner
+        }
     }
 
     if (loading) {
@@ -86,9 +93,15 @@ export default function PaymentMethodTable({ methods, onAdd, onUpdate, onDelete,
                                         py: 0.5,
                                         textTransform: 'none',
                                         minWidth: 80,
+                                        height: 36,
                                     }}
+                                    disabled={!newMethodName.trim() || adding}
                                 >
-                                    Add
+                                    {adding ? (
+                                        <CircularProgress size={16} color="inherit" />
+                                    ) : (
+                                        'Add'
+                                    )}
                                 </Button>
                             </TableCell>
                         </TableRow>
@@ -184,7 +197,7 @@ export default function PaymentMethodTable({ methods, onAdd, onUpdate, onDelete,
                                                         color="error"
                                                         size="small"
                                                         onClick={() => onDelete(method.id)}
-                                                        disabled={!!editId}
+                                                        disabled={!!editId || usedMethods.has(method.id)}
                                                         sx={{
                                                             border: '1px solid',
                                                             borderColor: 'error.main',
