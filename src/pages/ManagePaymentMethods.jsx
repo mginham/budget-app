@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import AppLayout from '../components/layout/AppLayout';
-import PaymentMethodForm from '../components/features/PaymentMethods/PaymentMethodForm.jsx'
 import PaymentMethodTable from '../components/features/PaymentMethods/PaymentMethodTable.jsx'
 import {
     CircularProgress,
@@ -65,12 +64,10 @@ export default function ManagePaymentMethods() {
                     <CircularProgress />
                 ) : (
                     <>
-                        {/* Form */}
-                        <PaymentMethodForm onAdd={handleAdd} />
-
                         {/* Table */}
                         <PaymentMethodTable
                             methods={methods}
+                            onAdd={handleAdd}
                             onUpdate={handleUpdate}
                             onDelete={handleDelete}
                             loading={loading}

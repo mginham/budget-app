@@ -13,9 +13,10 @@ import {
 } from '../../mui';
 import { useState } from 'react';
 
-export default function PaymentMethodTable({ methods, onUpdate, onDelete, loading }) {
+export default function PaymentMethodTable({ methods, onAdd, onUpdate, onDelete, loading }) {
     const [editId, setEditId] = useState(null)
     const [editFormData, setEditFormData] = useState({ name: '' })
+    const [newMethodName, setNewMethodName] = useState('')
 
     const startEdit = (method) => {
         setEditId(method.id)
@@ -33,6 +34,12 @@ export default function PaymentMethodTable({ methods, onUpdate, onDelete, loadin
         setEditFormData({ name: '' })
     }
 
+    const handleAddNew = async () => {
+        if (!newMethodName.trim()) return
+        await onAdd({ name: newMethodName })
+        setNewMethodName('')  // Clear after add
+    }
+
     if (loading) {
         return <Typography>Loading...</Typography>
     }
@@ -40,7 +47,7 @@ export default function PaymentMethodTable({ methods, onUpdate, onDelete, loadin
     return (
         <>
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
-                Logged Payment Methods
+                Payment Methods
             </Typography>
             <TableContainer component={Paper}>
                 <Table>
@@ -51,6 +58,41 @@ export default function PaymentMethodTable({ methods, onUpdate, onDelete, loadin
                         </TableRow>
                     </TableHead>
                     <TableBody>
+                        {/* Inline Add Row */}
+                        <TableRow>
+                            <TableCell align="center" sx={{ width: '70%' }}>
+                                <TextField
+                                    placeholder="New Payment Method"
+                                    value={newMethodName}
+                                    onChange={(e) => setNewMethodName(e.target.value)}
+                                    size="small"
+                                    sx={{
+                                        '& .MuiInputBase-input': {
+                                            fontSize: '0.875rem',
+                                        },
+                                    }}
+                                    fullWidth
+                                />
+                            </TableCell>
+                            <TableCell align="center" sx={{ width: '30%' }}>
+                                <Button
+                                    onClick={handleAddNew}
+                                    variant="contained"
+                                    color="primary"
+                                    size="small"
+                                    sx={{
+                                        borderRadius: 2,
+                                        px: 2,
+                                        py: 0.5,
+                                        textTransform: 'none',
+                                        minWidth: 80,
+                                    }}
+                                >
+                                    Add
+                                </Button>
+                            </TableCell>
+                        </TableRow>
+
                         {methods.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={2} align="center">
