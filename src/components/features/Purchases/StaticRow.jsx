@@ -16,8 +16,8 @@ export default function StaticRow({
         <>
             <TableCell align="center">{p.purchase}</TableCell>
             <TableCell align="center">${p.amount?.toFixed(2)}</TableCell>
-            <TableCell align="center">{p.paymentMethod}</TableCell>
-            <TableCell align="center">{p.lineItem}</TableCell>
+            <TableCell align="center">{p.paymentMethodName || 'N/A'}</TableCell>
+            <TableCell align="center">{p.lineItemName}</TableCell>
             <TableCell align="center">
                 {p.timestamp?.seconds
                     ? new Date(p.timestamp.seconds * 1000).toLocaleDateString(undefined, {

@@ -78,13 +78,13 @@ export default function PurchaseForm({
                             <InputLabel id="line-item-label">Line Item</InputLabel>
                             <Select
                                 labelId="line-item-label"
-                                name="lineItem"
-                                value={formData.lineItem}
+                                name="lineItemId"
+                                value={formData.lineItemId}
                                 onChange={handleChange}
                                 label="Line Item"
                             >
                             {budgets.map((b) => (
-                                <MenuItem key={b.id} value={b.lineItem}>
+                                <MenuItem key={b.id} value={b.id}>
                                     {b.lineItem}
                                 </MenuItem>
                             ))}

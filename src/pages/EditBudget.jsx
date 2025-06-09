@@ -118,6 +118,14 @@ export default function EditBudget() {
 
     }
 
+    // const purchasesWithLineItemNames = purchases.map(purchase => {
+    //     const lineItem = budgets.find(b => b.id === purchase.lineItemId)
+    //     return {
+    //         ...purchase,
+    //         lineItemName: lineItem ? lineItem.lineItem : '(Deleted)',
+    //     }
+    // })
+
     return (
         <AppLayout title="Edit Budget">
             <Container maxWidth="md" disableGutters sx={{ py: 4 }}>

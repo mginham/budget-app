@@ -89,12 +89,21 @@ export default function LogPurchases() {
                 const data = snapshot.docs
                     .map(doc => ({ id: doc.id, ...doc.data() }))
                     .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
-                setPurchases(data);
+
+                const purchasesWithLineItemNames = data.map(purchase => {
+                    const lineItem = budgets.find(b => b.id === purchase.lineItemId)
+                    return {
+                        ...purchase,
+                        lineItemName: lineItem ? lineItem.lineItem : '(Deleted)',
+                    }
+                })
+
+                setPurchases(purchasesWithLineItemNames);
             }
         )
 
         return () => unsubscribe();
-    }, [userId])
+    }, [userId, budgets])
 
 
     // Form Handlers
@@ -109,6 +118,11 @@ export default function LogPurchases() {
                 paymentMethodId: value,
                 paymentMethodName: selectedMethod ? selectedMethod.name : '',
             }))
+        } else if (name === 'lineItemId') {
+            setFormData((prevData) => ({
+                ...prevData,
+                lineItemId: value,
+            }))
         } else {
             setFormData((prevData) => ({
                 ...prevData,
@@ -120,9 +134,9 @@ export default function LogPurchases() {
     const handleSubmit = async (e) => {
         e.preventDefault()
 
-        const { purchase, amount, lineItem, paymentMethodId, paymentMethodName } = formData
+        const { purchase, amount, lineItemId, paymentMethodId, paymentMethodName } = formData
 
-        if (!purchase || !amount || !lineItem || !paymentMethodId) {
+        if (!purchase || !amount || !lineItemId || !paymentMethodId) {
             alert("Please fill in all required fields.")
             return
         }
@@ -134,7 +148,7 @@ export default function LogPurchases() {
         const newPurchase = {
             purchase,
             amount: parseFloat(amount),
-            lineItem,
+            lineItemId,
             timestamp,
             paymentMethodId,
             paymentMethodName
@@ -146,7 +160,7 @@ export default function LogPurchases() {
                 timestamp: "",
                 purchase: "",
                 amount: "",
-                lineItem: "",
+                lineItemId: "",
                 paymentMethodId: "",
                 paymentMethodName: ""
             })
@@ -175,12 +189,16 @@ export default function LogPurchases() {
 
     const handleSaveEdit = async () => {
         try {
+            const selectedMethod = paymentMethods.find(pm => pm.id === editingRowData.paymentMethodId) // Lookup payment method name from the selected ID
             const updated = {
                 ...editingRowData,
                 amount: parseFloat(editingRowData.amount),
                 timestamp: Timestamp.fromDate(new Date(editingRowData.timestamp)),
+                paymentMethodName: selectedMethod ? selectedMethod.name : '',
             }
             await updateDoc(doc(db, "users", userId, "purchases", editingRowId), updated)
+
+            // Clear editing state
             setEditingRowId(null)
             setEditingRowData({})
         } catch (err) {

@@ -48,15 +48,15 @@ export default function EditableRow({
             </TableCell>
             <TableCell align="center">
                 <Select
-                    name="paymentMethod"
-                    value={editingRowData.paymentMethod}
+                    name="paymentMethodId"
+                    value={editingRowData.paymentMethodId || ''}
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
                     sx={{ fontSize: '0.875rem' }}
                 >
                     {paymentMethods.map((pm) => (
-                        <MenuItem key={pm.id} value={pm.name}>{pm.name}</MenuItem>
+                        <MenuItem key={pm.id} value={pm.id}>{pm.name}</MenuItem>
                     ))}
                 </Select>
             </TableCell>
