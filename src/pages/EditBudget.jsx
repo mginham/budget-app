@@ -10,21 +10,13 @@ import {
 } from "firebase/firestore"
 import { useAuthStore } from "../store/authStore"
 import {
-    Button,
     CircularProgress,
     Container,
-    Paper,
-    Stack,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    TextField,
     Typography,
-} from '../components/mui';
-import AppLayout from '../components/layout/AppLayout';
+} from '../components/mui'
+import AppLayout from '../components/layout/AppLayout'
+import BudgetTable from '../components/features/Budget/BudgetTable'
+import hasPurchasesForBudgetLineItem from '../services/budgetService'
 
 export default function EditBudget() {
 
@@ -35,11 +27,7 @@ export default function EditBudget() {
 
     // State Variables
     const [budgets, setBudgets] = useState([])
-    const [newLineItem, setNewLineItem] = useState({
-        lineItem: "",
-        spendingLimit: "",
-        expectedDate: ""
-    })
+    const [usedBudgets, setUsedBudgets] = useState(new Set());
     const [loading, setLoading] = useState(true)
 
 
@@ -54,9 +42,9 @@ export default function EditBudget() {
 
         const fetchData = async () => {
             await fetchBudgets()
+            await fetchUsedBudgets()
             setLoading(false)
         }
-
 
         fetchData()
     }, [userId])
@@ -70,61 +58,43 @@ export default function EditBudget() {
         setBudgets(data)
     }
 
-    const handleInputChange = (id, field, value) => {
-        setBudgets((prev) =>
-            prev.map((item) =>
-                item.id === id ? { ...item, [field]: value } : item
-            )
-        )
-    }
-
-    const handleSave = async (id, updatedItem) => {
-        const docRef = doc(db, "users", userId, "budgets", id)
-        await updateDoc(docRef, {
-            ...updatedItem,
-            spendingLimit: parseFloat(updatedItem.spendingLimit),
-        })
-        fetchBudgets(userId)
+    const fetchUsedBudgets = async () => {
+        const used = await hasPurchasesForBudgetLineItem(userId)
+        setUsedBudgets(used)
     }
 
     const handleDelete = async (id) => {
         const docRef = doc(db, "users", userId, "budgets", id)
         await deleteDoc(docRef)
-        fetchBudgets(userId)
+        fetchBudgets()
+        fetchUsedBudgets()
     }
 
-    const handleAdd = async () => {
-        if (!userId) {
-            console.warn("No userId found. User not logged in yet?")
-            return
+    const handleAdd = async (newItem) => {
+        const data = {
+            ...newItem,
+            spendingLimit: parseFloat(newItem.spendingLimit)
         }
-
-        const newData = {
-            ...newLineItem,
-            spendingLimit: parseFloat(newLineItem.spendingLimit),
-        }
-
-        try {
-            await addDoc(collection(db, "users", userId, "budgets"), newData)
-            setNewLineItem({
-                lineItem: "",
-                spendingLimit: "",
-                expectedDate: ""
-            })
-            fetchBudgets(userId)
-        } catch (error) {
-            console.error("Failed to add budget:", error)
-        }
-
+        await addDoc(collection(db, "users", userId, "budgets"), data)
+        fetchBudgets()
     }
 
-    // const purchasesWithLineItemNames = purchases.map(purchase => {
-    //     const lineItem = budgets.find(b => b.id === purchase.lineItemId)
-    //     return {
-    //         ...purchase,
-    //         lineItemName: lineItem ? lineItem.lineItem : '(Deleted)',
-    //     }
-    // })
+    const handleUpdate = async (id, updatedItem, saveExplicit = false) => {
+        const docRef = doc(db, "users", userId, "budgets", id)
+        await updateDoc(docRef, {
+            ...updatedItem,
+            spendingLimit: parseFloat(updatedItem.spendingLimit)
+        })
+        // Only refetch after an explicit Save button click
+        if (saveExplicit) {
+            fetchBudgets()
+        } else {
+            // Just update in local state for editing experience
+            setBudgets(prev =>
+                prev.map(item => item.id === id ? updatedItem : item)
+            )
+        }
+    }
 
     return (
         <AppLayout title="Edit Budget">
@@ -133,138 +103,13 @@ export default function EditBudget() {
                 {loading ? (
                     <CircularProgress />
                 ) : (
-                    <>
-                        <TableContainer component={Paper} sx={{ width: '100%' }}>
-                            <Table>
-                                <TableHead sx={{ backgroundColor: "grey.100" }}>
-                                    <TableRow>
-                                        <TableCell>Item</TableCell>
-                                        <TableCell>Assigned</TableCell>
-                                        <TableCell>Expected Date</TableCell>
-                                        <TableCell>Actions</TableCell>
-                                    </TableRow>
-                                </TableHead>
-
-                                <TableBody>
-                                    {budgets.map((item) => (
-                                        <TableRow key={item.id} hover>
-                                            <TableCell>
-                                                <TextField
-                                                    value={item.lineItem}
-                                                    onChange={(e) =>
-                                                        handleInputChange(item.id, "lineItem", e.target.value)
-                                                    }
-                                                    variant="outlined"
-                                                    size="small"
-                                                    fullWidth
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <TextField
-                                                    type="number"
-                                                    value={item.spendingLimit}
-                                                    onChange={(e) =>
-                                                        handleInputChange(item.id, "spendingLimit", e.target.value)
-                                                    }
-                                                    variant="outlined"
-                                                    size="small"
-                                                    fullWidth
-                                                    inputProps={{ min: 0, step: 0.01 }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <TextField
-                                                    type="date"
-                                                    value={item.expectedDate || ""}
-                                                    onChange={(e) =>
-                                                        handleInputChange(item.id, "expectedDate", e.target.value)
-                                                    }
-                                                    variant="outlined"
-                                                    size="small"
-                                                    fullWidth
-                                                    InputLabelProps={{ shrink: true }}
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <Stack direction="row" spacing={1}>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="success"
-                                                        size="small"
-                                                        onClick={() => handleSave(item.id, item)}
-                                                    >
-                                                        Save
-                                                    </Button>
-                                                    <Button
-                                                        variant="contained"
-                                                        color="error"
-                                                        size="small"
-                                                        onClick={() => handleDelete(item.id)}
-                                                    >
-                                                        Delete
-                                                    </Button>
-                                                </Stack>
-                                            </TableCell>
-                                        </TableRow>
-                                    ))}
-
-                                    {/* Add New Line Item */}
-                                    <TableRow sx={{ backgroundColor: "yellow.50" }}>
-                                        <TableCell>
-                                            <TextField
-                                                value={newLineItem.lineItem}
-                                                onChange={(e) =>
-                                                    setNewLineItem({ ...newLineItem, lineItem: e.target.value })
-                                                }
-                                                placeholder="New item"
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                type="number"
-                                                value={newLineItem.spendingLimit}
-                                                onChange={(e) =>
-                                                    setNewLineItem({ ...newLineItem, spendingLimit: e.target.value })
-                                                }
-                                                placeholder="Budgeted"
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                                inputProps={{ min: 0, step: 0.01 }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <TextField
-                                                type="date"
-                                                value={newLineItem.expectedDate}
-                                                onChange={(e) =>
-                                                    setNewLineItem({ ...newLineItem, expectedDate: e.target.value })
-                                                }
-                                                variant="outlined"
-                                                size="small"
-                                                fullWidth
-                                                InputLabelProps={{ shrink: true }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                onClick={handleAdd}
-                                                variant="contained"
-                                                color="primary"
-                                                size="small"
-                                                disabled={!userId}
-                                            >
-                                                Add
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
-                    </>
+                    <BudgetTable
+                        budgets={budgets}
+                        usedBudgets={usedBudgets}
+                        onAdd={handleAdd}
+                        onUpdate={handleUpdate}
+                        onDelete={handleDelete}
+                    />
                 )}
             </Container>
         </AppLayout>
