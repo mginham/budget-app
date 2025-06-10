@@ -15,7 +15,7 @@ import {
     Typography,
 } from '../components/mui'
 import AppLayout from '../components/layout/AppLayout'
-import BudgetTable from '../components/features/Budget/BudgetTable'
+import BudgetTable from '../components/features/Budget/EditBudgetTable'
 import hasPurchasesForBudgetLineItem from '../services/budgetService'
 
 export default function EditBudget() {

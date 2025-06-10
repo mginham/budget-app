@@ -18,6 +18,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AppLayout from '../components/layout/AppLayout';
+import BudgetTable from '../components/features/Budget/SpentBudgetTable';
 
 
 export default function Dashboard() {
@@ -120,32 +121,11 @@ export default function Dashboard() {
             ) : budgets.length === 0 ? (
                 <Typography>No budget items found.</Typography>
             ) : (
-                <Table sx={{ minWidth: 650, border: '1px solid', borderColor: 'divider' }}>
-                    <TableHead>
-                        <TableRow sx={{ backgroundColor: 'action.hover' }}>
-                            <TableCell><b>Item</b></TableCell>
-                            <TableCell><b>Assigned</b></TableCell>
-                            <TableCell><b>Expected Date</b></TableCell>
-                            <TableCell><b>Spent ({selectedMonth.format('MMM YYYY')})</b></TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {budgets.map(item => (
-                            <TableRow key={item.id} hover>
-                                <TableCell>{item.lineItem}</TableCell>
-                                <TableCell>
-                                    {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(item.spendingLimit)}
-                                </TableCell>
-                                <TableCell>
-                                    {item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-'}
-                                </TableCell>
-                                <TableCell>
-                                    {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(spendingByLineItem[item.id] || 0)}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
+                <BudgetTable
+                    budgets={budgets}
+                    spendingByLineItem={spendingByLineItem}
+                    selectedMonth={selectedMonth}
+                />
             )}
         </AppLayout>
     )
