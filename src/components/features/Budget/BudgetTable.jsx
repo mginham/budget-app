@@ -249,7 +249,13 @@ export default function BudgetTable({
                                                 fullWidth
                                             />
                                         ) : (
-                                            item.expectedDate || '-'
+                                            item.expectedDate
+                                                ? new Intl.DateTimeFormat('en-US', {
+                                                    year: 'numeric',
+                                                    month: 'short',
+                                                    day: 'numeric',
+                                                    }).format(new Date(item.expectedDate))
+                                                : '-'
                                         )}
                                     </TableCell>
                                     <TableCell align="center">

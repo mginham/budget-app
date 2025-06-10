@@ -2,8 +2,10 @@ import { useAuthStore } from '../store/authStore'
 import { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
+import dayjs from 'dayjs'
 import {
     Box,
+    Button,
     CircularProgress,
     Table,
     TableBody,
@@ -12,6 +14,9 @@ import {
     TableRow,
     Typography,
 } from '../components/mui';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AppLayout from '../components/layout/AppLayout';
 
 
@@ -23,31 +28,29 @@ export default function Dashboard() {
     const title = `Welcome, ${user?.displayName || user?.email}!`;
 
     const [budgets, setBudgets] = useState([])
+    const [purchases, setPurchases] = useState([])
     const [loading, setLoading] = useState(true)
-
-    const [anchorEl, setAnchorEl] = useState(null)
-    const open = Boolean(anchorEl)
-
-    const handleMenuOpen = (event) => {
-        setAnchorEl(event.currentTarget)
-    }
-
-    const handleMenuClose = () => {
-        setAnchorEl(null)
-    }
+    const [selectedMonth, setSelectedMonth] = useState(dayjs())
 
     useEffect(() => {
         if (!userId) return
 
-        const fetchBudgets = async () => {
+        const fetchData = async () => {
             try {
                 const budgetRef = collection(db, 'users', userId, 'budgets')
-                const snapshot = await getDocs(budgetRef)
-                const data = snapshot.docs.map(doc => ({
+                const purchaseRef = collection(db, 'users', userId, 'purchases')
+
+                const [budgetSnap, purchaseSnap] = await Promise.all([
+                    getDocs(budgetRef),
+                    getDocs(purchaseRef),
+                ])
+
+                setBudgets(budgetSnap.docs.map(doc => ({ id: doc.id, ...doc.data() })))
+                setPurchases(purchaseSnap.docs.map(doc => ({
                     id: doc.id,
-                    ...doc.data()
-                }))
-                setBudgets(data)
+                    ...doc.data(),
+                    timestamp: doc.data().timestamp?.toDate?.() || null,
+                })))
             } catch (error) {
                 console.error('Failed to fetch budgets:', error)
             } finally {
@@ -55,14 +58,60 @@ export default function Dashboard() {
             }
         }
 
-        fetchBudgets()
+        fetchData()
     }, [userId])
+
+    const spendingByLineItem = {}
+
+    purchases
+        .filter(p => dayjs(p.timestamp).format('YYYY-MM') === selectedMonth.format('YYYY-MM'))
+        .forEach(p => {
+            const key = p.lineItemId
+            if (!key) return
+            if (!spendingByLineItem[key]) spendingByLineItem[key] = 0
+            spendingByLineItem[key] += parseFloat(p.amount || 0)
+        });
+
+    const handleExport = () => {
+        const header = ['Item', 'Assigned', 'Expected Date', `Spent (${selectedMonth.format('MMM YYYY')})`]
+        const rows = budgets.map(item => [
+            item.lineItem,
+            `$${parseFloat(item.spendingLimit).toFixed(2)}`,
+            item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-',
+            `$${(spendingByLineItem[item.lineItem] || 0).toFixed(2)}`,
+        ])
+
+        const csvContent = [header, ...rows].map(row => row.join(',')).join('\n')
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', `budget_summary_${selectedMonth.format('YYYY_MM')}.csv`)
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+    }
 
     return (
         <AppLayout title={title}>
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
-                Your Budget
+                Your Monthly Budget
             </Typography>
+
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                    <DatePicker
+                        views={["year", "month"]}
+                        openTo="month"
+                        label="Select Month"
+                        value={selectedMonth}
+                        onChange={(newValue) => setSelectedMonth(newValue)}
+                    />
+                    <Button variant="outlined" onClick={handleExport}>
+                        Export Table
+                    </Button>
+                </Box>
+            </LocalizationProvider>
 
             {loading ? (
                 <Box display="flex" justifyContent="center" my={4}>
@@ -77,14 +126,22 @@ export default function Dashboard() {
                             <TableCell><b>Item</b></TableCell>
                             <TableCell><b>Assigned</b></TableCell>
                             <TableCell><b>Expected Date</b></TableCell>
+                            <TableCell><b>Spent ({selectedMonth.format('MMM YYYY')})</b></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {budgets.map(item => (
                             <TableRow key={item.id} hover>
                                 <TableCell>{item.lineItem}</TableCell>
-                                <TableCell>${parseFloat(item.spendingLimit).toFixed(2)}</TableCell>
-                                <TableCell>{item.expectedDate || '-'}</TableCell>
+                                <TableCell>
+                                    {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(item.spendingLimit)}
+                                </TableCell>
+                                <TableCell>
+                                    {item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-'}
+                                </TableCell>
+                                <TableCell>
+                                    {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(spendingByLineItem[item.id] || 0)}
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
