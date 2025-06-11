@@ -35,7 +35,9 @@ export default function BudgetTable({ budgets, spendingByLineItem, selectedMonth
                             <TableRow key={item.id} hover>
                                 <TableCell align="center">{item.lineItem}</TableCell>
                                 <TableCell align="center">
-                                    {item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-'}
+                                    {item.expectedDay
+                                        ? selectedMonth.date(item.expectedDay).format('MMM D, YYYY')
+                                        : '-'}
                                 </TableCell>
                                 <TableCell align="center">
                                     {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(item.spendingLimit)}

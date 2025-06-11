@@ -11,10 +11,20 @@ import {
     TableRow,
     TextField,
     Typography,
-} from '../../mui';
-import { useState } from 'react';
+} from '../../mui'
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
+import { useState } from 'react'
 
-export default function BudgetTable({
+function getOrdinalSuffix(day) {
+    const j = day % 10, k = day % 100
+    if (j === 1 && k !== 11) return 'st'
+    if (j === 2 && k !== 12) return 'nd'
+    if (j === 3 && k !== 13) return 'rd'
+    return 'th'
+}
+
+export default function EditBudgetTable({
     budgets,
     usedBudgets,
     onAdd,
@@ -25,7 +35,7 @@ export default function BudgetTable({
     const [newBudget, setNewBudget] = useState({
         lineItem: '',
         spendingLimit: '',
-        expectedDate: '',
+        expectedDay: '',
     })
     const [adding, setAdding] = useState(false)
 
@@ -33,7 +43,39 @@ export default function BudgetTable({
     const [editFormData, setEditFormData] = useState({
         lineItem: '',
         spendingLimit: '',
-        expectedDate: '',
+        expectedDay: '',
+    })
+
+    const [sortColumn, setSortColumn] = useState(null)
+    const [sortDirection, setSortDirection] = useState('asc')
+
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'))
+        } else {
+            setSortColumn(column)
+            setSortDirection('asc')
+        }
+    }
+
+    const sortedBudgets = [...budgets].sort((a, b) => {
+        const valA = a[sortColumn]
+        const valB = b[sortColumn]
+
+        if (valA === undefined || valA === null) return 1
+        if (valB === undefined || valB === null) return -1
+
+        if (typeof valA === 'string') {
+            return sortDirection === 'asc'
+                ? valA.localeCompare(valB)
+                : valB.localeCompare(valA)
+        }
+
+        if (typeof valA === 'number') {
+            return sortDirection === 'asc' ? valA - valB : valB - valA
+        }
+
+        return 0
     })
 
     const handleNewChange = (field, value) => {
@@ -48,7 +90,7 @@ export default function BudgetTable({
             setNewBudget({
                 lineItem: '',
                 spendingLimit: '',
-                expectedDate: '',
+                expectedDay: '',
             })  // clear field
         } finally {
             setAdding(false)  // always stop spinner
@@ -60,7 +102,7 @@ export default function BudgetTable({
         setEditFormData({
             lineItem: item.lineItem,
             spendingLimit: item.spendingLimit,
-            expectedDate: item.expectedDate || '',
+            expectedDay: item.expectedDay || '',
         })
     }
 
@@ -70,7 +112,7 @@ export default function BudgetTable({
         setEditFormData({
             lineItem: '',
             spendingLimit: '',
-            expectedDate: '',
+            expectedDay: '',
         })
     }
 
@@ -79,9 +121,15 @@ export default function BudgetTable({
         setEditFormData({
             lineItem: '',
             spendingLimit: '',
-            expectedDate: '',
+            expectedDay: '',
         })
     }
+
+    const headers = [
+        { key: 'lineItem', label: 'Budget Item', width: '25%' },
+        { key: 'spendingLimit', label: 'Assigned ($)', width: '16%' },
+        { key: 'expectedDay', label: 'Expected Day', width: '16%' },
+    ]
 
     if (loading) {
         return <Typography>Loading...</Typography>
@@ -96,9 +144,25 @@ export default function BudgetTable({
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ width: '25%' }}>Budget Item</TableCell>
-                            <TableCell sx={{ width: '16%' }}>Assigned ($)</TableCell>
-                            <TableCell sx={{ width: '16%' }}>Expected Date</TableCell>
+                            {headers.map(({ key, label, width }) => (
+                                <TableCell
+                                    key={key}
+                                    sx={{ width, cursor: 'pointer', userSelect: 'none' }}
+                                    onClick={() => handleSort(key)}
+                                    align="center"
+                                >
+                                    <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
+                                        <span>{label}</span>
+                                        {sortColumn === key && (
+                                            sortDirection === 'asc' ? (
+                                                <ArrowUpwardIcon fontSize="small" />
+                                            ) : (
+                                                <ArrowDownwardIcon fontSize="small" />
+                                            )
+                                        )}
+                                    </Stack>
+                                </TableCell>
+                            ))}
                             <TableCell sx={{ width: '11%' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
@@ -139,10 +203,12 @@ export default function BudgetTable({
                             </TableCell>
                             <TableCell align="center">
                                 <TextField
-                                    value={newBudget.expectedDate}
-                                    type="date"
-                                    onChange={(e) => handleNewChange('expectedDate', e.target.value)}
+                                    placeholder="Day (1–31)"
+                                    value={newBudget.expectedDay}
+                                    type="number"
+                                    onChange={(e) => handleNewChange('expectedDay', e.target.value)}
                                     size="small"
+                                    inputProps={{ min: 1, max: 31 }}
                                     sx={{
                                         '& .MuiInputBase-input': {
                                             fontSize: '0.875rem',
@@ -176,14 +242,14 @@ export default function BudgetTable({
                             </TableCell>
                         </TableRow>
 
-                        {budgets.length === 0 ? (
+                        {sortedBudgets.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={4} align="center">
                                     No budget items logged.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            budgets.map((item) => (
+                            sortedBudgets.map((item) => (
                                 <TableRow key={item.id} hover>
                                     <TableCell align="center">
                                         {editId === item.id ? (
@@ -234,15 +300,17 @@ export default function BudgetTable({
                                     <TableCell align="center">
                                         {editId === item.id ? (
                                             <TextField
-                                                value={editFormData.expectedDate || ''}
-                                                type="date"
+                                                placeholder="Day"
+                                                value={editFormData.expectedDay  || ''}
+                                                type="number"
                                                 onChange={(e) =>
                                                     setEditFormData(prev => ({
                                                         ...prev,
-                                                        expectedDate: e.target.value,
+                                                        expectedDay: e.target.value,
                                                     }))
                                                 }
                                                 size="small"
+                                                inputProps={{ min: 1, max: 31 }}
                                                 sx={{
                                                     '& .MuiInputBase-input': {
                                                         fontSize: '0.875rem',
@@ -251,12 +319,8 @@ export default function BudgetTable({
                                                 fullWidth
                                             />
                                         ) : (
-                                            item.expectedDate
-                                                ? new Intl.DateTimeFormat('en-US', {
-                                                    year: 'numeric',
-                                                    month: 'short',
-                                                    day: 'numeric',
-                                                    }).format(new Date(item.expectedDate))
+                                            item.expectedDay
+                                                ? `${item.expectedDay}${getOrdinalSuffix(item.expectedDay)}`
                                                 : '-'
                                         )}
                                     </TableCell>

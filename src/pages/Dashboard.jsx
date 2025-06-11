@@ -76,7 +76,9 @@ export default function Dashboard() {
         const header = ['Item', 'Expected Date', 'Assigned', `Spent (${selectedMonth.format('MMM YYYY')})`]
         const rows = budgets.map(item => [
             item.lineItem,
-            item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-',
+            item.expectedDay
+                ? selectedMonth.date(item.expectedDay).format('MMM D, YYYY')
+                : '-',
             `$${parseFloat(item.spendingLimit).toFixed(2)}`,
             `$${(spendingByLineItem[item.lineItem] || 0).toFixed(2)}`,
         ])

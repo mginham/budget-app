@@ -12,6 +12,8 @@ import {
     TextField,
     Typography,
 } from '../../mui';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { useState } from 'react';
 
 export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpdate, onDelete, loading }) {
@@ -19,6 +21,9 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
     const [editFormData, setEditFormData] = useState({ name: '' })
     const [newMethodName, setNewMethodName] = useState('')
     const [adding, setAdding] = useState(false)
+
+    const [sortColumn, setSortColumn] = useState('name')
+    const [sortDirection, setSortDirection] = useState('asc')
 
     const startEdit = (method) => {
         setEditId(method.id)
@@ -47,6 +52,30 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
         }
     }
 
+    // Handle sorting toggle
+    const handleSort = (column) => {
+        if (sortColumn === column) {
+            setSortDirection(prev => (prev === 'asc' ? 'desc' : 'asc'))
+        } else {
+            setSortColumn(column)
+            setSortDirection('asc')
+        }
+    }
+
+    // Sort methods before rendering
+    const sortedMethods = [...methods].sort((a, b) => {
+        const valA = a[sortColumn] || ''
+        const valB = b[sortColumn] || ''
+
+        if (typeof valA === 'string') {
+            return sortDirection === 'asc'
+                ? valA.localeCompare(valB)
+                : valB.localeCompare(valA)
+        }
+
+        return 0
+    })
+
     if (loading) {
         return <Typography>Loading...</Typography>
     }
@@ -60,8 +89,23 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{ width: '70%' }}>Name</TableCell>
-                            <TableCell sx={{ width: '30%' }}>Actions</TableCell>
+                            <TableCell
+                                sx={{ width: '70%', cursor: 'pointer', userSelect: 'none' }}
+                                onClick={() => handleSort('name')}
+                                align="center"
+                            >
+                                <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
+                                    <span>Name</span>
+                                    {sortColumn === 'name' && (
+                                        sortDirection === 'asc' ? (
+                                            <ArrowUpwardIcon fontSize="small" />
+                                        ) : (
+                                            <ArrowDownwardIcon fontSize="small" />
+                                        )
+                                    )}
+                                </Stack>
+                            </TableCell>
+                            <TableCell sx={{ width: '30%' }} align="center">Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -106,14 +150,14 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
                             </TableCell>
                         </TableRow>
 
-                        {methods.length === 0 ? (
+                        {sortedMethods.length === 0 ? (
                             <TableRow>
                                 <TableCell colSpan={2} align="center">
                                     No payment methods logged.
                                 </TableCell>
                             </TableRow>
                         ) : (
-                            methods.map((method) => (
+                            sortedMethods.map((method) => (
                                 <TableRow key={method.id}>
                                     <TableCell align="center" sx={{ width: '70%' }}>
                                         {editId === method.id ? (

@@ -15,7 +15,7 @@ import {
     Typography,
 } from '../components/mui'
 import AppLayout from '../components/layout/AppLayout'
-import BudgetTable from '../components/features/Budget/EditBudgetTable'
+import EditBudgetTable from '../components/features/Budget/EditBudgetTable'
 import hasPurchasesForBudgetLineItem from '../services/budgetService'
 
 export default function EditBudget() {
@@ -103,7 +103,7 @@ export default function EditBudget() {
                 {loading ? (
                     <CircularProgress />
                 ) : (
-                    <BudgetTable
+                    <EditBudgetTable
                         budgets={budgets}
                         usedBudgets={usedBudgets}
                         onAdd={handleAdd}
