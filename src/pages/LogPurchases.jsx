@@ -38,7 +38,7 @@ export default function LogPurchases() {
         timestamp: "",
         purchase: "",
         amount: "",
-        lineItem: "",
+        lineItemId: "",
         paymentMethodId: "",
         paymentMethodName: "",
     })
@@ -151,7 +151,7 @@ export default function LogPurchases() {
             lineItemId,
             timestamp,
             paymentMethodId,
-            paymentMethodName
+            paymentMethodName,
         }
 
         try {
@@ -162,7 +162,7 @@ export default function LogPurchases() {
                 amount: "",
                 lineItemId: "",
                 paymentMethodId: "",
-                paymentMethodName: ""
+                paymentMethodName: "",
             })
         } catch (err) {
             console.error("Error logging purchase:", err)
@@ -233,7 +233,7 @@ export default function LogPurchases() {
                         {/* Alerts */}
                         {budgets.length === 0 && (
                             <Alert severity="warning" sx={{ mb: 2 }}>
-                                No budget line items. Please{' '}
+                                No budget line items logged. Please{' '}
                                 <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
                                     edit your budget
                                 </Link>

@@ -96,18 +96,18 @@ export default function BudgetTable({
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Item</TableCell>
-                            <TableCell>Assigned</TableCell>
-                            <TableCell>Expected Date</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell sx={{ width: '25%' }}>Budget Item</TableCell>
+                            <TableCell sx={{ width: '16%' }}>Assigned ($)</TableCell>
+                            <TableCell sx={{ width: '16%' }}>Expected Date</TableCell>
+                            <TableCell sx={{ width: '11%' }}>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {/* Inline Add Row */}
                         <TableRow>
-                            <TableCell align="center">
+                            <TableCell align="center" sx={{ width: '25%' }}>
                                 <TextField
-                                    placeholder="New Budget Item"
+                                    placeholder="New Item*"
                                     value={newBudget.lineItem}
                                     onChange={(e) => handleNewChange('lineItem', e.target.value)}
                                     size="small"
@@ -116,12 +116,13 @@ export default function BudgetTable({
                                             fontSize: '0.875rem',
                                         },
                                     }}
+                                    required
                                     fullWidth
                                 />
                             </TableCell>
                             <TableCell align="center">
                                 <TextField
-                                    placeholder="Assigned"
+                                    placeholder="Assigned ($)*"
                                     value={newBudget.spendingLimit}
                                     type="number"
                                     onChange={(e) => handleNewChange('spendingLimit', e.target.value)}
@@ -132,6 +133,7 @@ export default function BudgetTable({
                                         },
                                     }}
                                     inputProps={{ min: 0, step: 0.01 }}
+                                    required
                                     fullWidth
                                 />
                             </TableCell>
@@ -259,7 +261,7 @@ export default function BudgetTable({
                                         )}
                                     </TableCell>
                                     <TableCell align="center">
-                                        <Stack direction="row" spacing={1} justifyContent="center">
+                                        <Stack direction="column" spacing={1} justifyContent="center">
                                             {editId === item.id ? (
                                                 <>
                                                     <Button

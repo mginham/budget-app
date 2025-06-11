@@ -3,22 +3,21 @@ import { useEffect, useState } from 'react'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../firebase'
 import dayjs from 'dayjs'
+import { Link } from "react-router-dom"
 import {
+    Alert,
     Box,
     Button,
     CircularProgress,
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableRow,
+    Stack,
     Typography,
 } from '../components/mui';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AppLayout from '../components/layout/AppLayout';
-import BudgetTable from '../components/features/Budget/SpentBudgetTable';
+import BudgetTable from '../components/features/Dashboard/SpentBudgetTable';
+import SpendingPieChart from '../components/features/Dashboard/SpendingPieChart'
 
 
 export default function Dashboard() {
@@ -74,11 +73,11 @@ export default function Dashboard() {
         });
 
     const handleExport = () => {
-        const header = ['Item', 'Assigned', 'Expected Date', `Spent (${selectedMonth.format('MMM YYYY')})`]
+        const header = ['Item', 'Expected Date', 'Assigned', `Spent (${selectedMonth.format('MMM YYYY')})`]
         const rows = budgets.map(item => [
             item.lineItem,
-            `$${parseFloat(item.spendingLimit).toFixed(2)}`,
             item.expectedDate ? dayjs(item.expectedDate).format('MMM D, YYYY') : '-',
+            `$${parseFloat(item.spendingLimit).toFixed(2)}`,
             `$${(spendingByLineItem[item.lineItem] || 0).toFixed(2)}`,
         ])
 
@@ -95,12 +94,8 @@ export default function Dashboard() {
 
     return (
         <AppLayout title={title}>
-            <Typography variant="h5" fontWeight="semiBold" mb={2}>
-                Your Monthly Budget
-            </Typography>
-
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <Box display="flex" alignItems="center" gap={2} mb={2}>
+                <Box display="flex" justifyContent="space-between" alignItems="center" gap={2} mb={2}>
                     <DatePicker
                         views={["year", "month"]}
                         openTo="month"
@@ -108,7 +103,7 @@ export default function Dashboard() {
                         value={selectedMonth}
                         onChange={(newValue) => setSelectedMonth(newValue)}
                     />
-                    <Button variant="outlined" onClick={handleExport}>
+                    <Button variant="contained" color="link" sx={{ height: 40, color: '#FFFFFF' }} onClick={handleExport}>
                         Export Table
                     </Button>
                 </Box>
@@ -119,13 +114,28 @@ export default function Dashboard() {
                     <CircularProgress />
                 </Box>
             ) : budgets.length === 0 ? (
-                <Typography>No budget items found.</Typography>
+                <>
+                    {/* Alerts */}
+                    <Alert severity="warning" sx={{ mb: 2 }}>
+                        No budget line items logged. Please{' '}
+                        <Link to="/edit-budget" style={{ color: '#1976d2', textDecoration: 'underline' }}>
+                            edit your budget
+                        </Link>
+                        .
+                    </Alert>
+                </>
             ) : (
-                <BudgetTable
-                    budgets={budgets}
-                    spendingByLineItem={spendingByLineItem}
-                    selectedMonth={selectedMonth}
-                />
+                <Stack spacing={6} mt={5}>
+                    <BudgetTable
+                        budgets={budgets}
+                        spendingByLineItem={spendingByLineItem}
+                        selectedMonth={selectedMonth}
+                    />
+                    <SpendingPieChart
+                        budgets={budgets}
+                        spendingByLineItem={spendingByLineItem}
+                    />
+                </Stack>
             )}
         </AppLayout>
     )
