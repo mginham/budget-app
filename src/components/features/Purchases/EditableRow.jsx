@@ -62,15 +62,15 @@ export default function EditableRow({
             </TableCell>
             <TableCell align="center">
                 <Select
-                    name="lineItem"
-                    value={editingRowData.lineItem}
+                    name="lineItemId"
+                    value={editingRowData.lineItemId || ''}
                     onChange={handleEditChange}
                     fullWidth
                     size="small"
                     sx={{ fontSize: '0.875rem' }}
                 >
                     {budgets.map((b) => (
-                        <MenuItem key={b.id} value={b.lineItem}>{b.lineItem}</MenuItem>
+                        <MenuItem key={b.id} value={b.id}>{b.lineItem}</MenuItem>
                     ))}
                 </Select>
             </TableCell>

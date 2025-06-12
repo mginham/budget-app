@@ -7,13 +7,21 @@ import {
     TableHead,
     TableRow,
     Typography,
-} from '../../mui';
-import dayjs from 'dayjs'
+} from '../../mui'
 
-export default function BudgetTable({ budgets, spendingByLineItem, selectedMonth }) {
+export default function SpentBudgetTable({ budgets, spendingByLineItem, selectedMonth }) {
     const totalAssigned = budgets.reduce((sum, item) => sum + parseFloat(item.spendingLimit || 0), 0)
     const totalSpent = budgets.reduce((sum, item) => sum + (spendingByLineItem[item.id] || 0), 0)
 
+    const formattedTotalAssigned = new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+    }).format(totalAssigned)
+
+    const formattedTotalSpent = new Intl.NumberFormat('en-CA', {
+        style: 'currency',
+        currency: 'CAD',
+    }).format(totalSpent)
 
     return (
         <>
@@ -59,11 +67,11 @@ export default function BudgetTable({ budgets, spendingByLineItem, selectedMonth
                         ))}
 
                         {/* Summary Row */}
-                        <TableRow sx={{ backgroundColor: 'action.selected', borderTop: '2px solid', borderColor: 'black' }}>
+                        <TableRow sx={{ backgroundColor: 'action.selected', borderTop: '2px solid', borderColor: '#87898a' }}>
                             <TableCell align="center" sx={{ fontWeight: 'bold' }}>Total</TableCell>
                             <TableCell align="center"></TableCell>
                             <TableCell align="center" sx={{ fontWeight: 'bold' }}>
-                                {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(totalAssigned)}
+                                {formattedTotalAssigned}
                             </TableCell>
                             <TableCell
                                 align="center"
@@ -72,7 +80,7 @@ export default function BudgetTable({ budgets, spendingByLineItem, selectedMonth
                                     fontWeight: 'bold',
                                 }}
                             >
-                                {new Intl.NumberFormat('en-CA', { style: 'currency', currency: 'CAD' }).format(totalSpent)}
+                                {formattedTotalSpent}
                             </TableCell>
                         </TableRow>
                     </TableBody>

@@ -48,7 +48,7 @@ export default function AuthForm() {
             }}
         >
             <Typography variant="h5" fontWeight="bold" mb={3} textAlign="center">
-                {isRegistering ? "Register" : "Login"}
+                Budget {isRegistering ? "Register" : "Login"}
             </Typography>
 
             <form onSubmit={handleSubmit}>
@@ -61,6 +61,10 @@ export default function AuthForm() {
                             onChange={(e) => setDisplayName(e.target.value)}
                             required
                             fullWidth
+                            autoComplete="off"
+                            inputProps={{
+                                autoComplete: 'off',
+                            }}
                         />
                     )}
 
@@ -70,6 +74,10 @@ export default function AuthForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        autoComplete="off"
+                        inputProps={{
+                            autoComplete: 'off',
+                        }}
                     />
 
                     <TextField
@@ -78,6 +86,10 @@ export default function AuthForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        autoComplete="off"
+                        inputProps={{
+                            autoComplete: 'off',
+                        }}
                     />
 
                     <Button type="submit" fullWidth>

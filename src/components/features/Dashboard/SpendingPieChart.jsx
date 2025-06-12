@@ -1,4 +1,3 @@
-import React from 'react'
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts'
 import { Box, Typography } from '@mui/material'
 
@@ -12,6 +11,39 @@ const COLORS = [
 // Custom label function to show percentage
 const renderCustomizedLabel = ({ percent }) => {
     return `${(percent * 100).toFixed(0)}%`
+}
+
+// Custom legend renderer to place legend items vertically
+const renderLegend = (props) => {
+    const { payload } = props
+    if (!payload) return null
+
+    return (
+        <Box
+            sx={{
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'center',
+                ml: 2,
+                fontSize: 14,
+            }}
+        >
+            {payload.map((entry, index) => (
+                <Box key={`item-${index}`} sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                    <Box
+                        sx={{
+                            width: 14,
+                            height: 14,
+                            backgroundColor: entry.color,
+                            mr: 1,
+                            borderRadius: '2px',
+                        }}
+                    />
+                    <span>{entry.value}</span>
+                </Box>
+            ))}
+        </Box>
+    )
 }
 
 export default function SpendingPieChart({ budgets, spendingByLineItem }) {
@@ -51,31 +83,51 @@ export default function SpendingPieChart({ budgets, spendingByLineItem }) {
                 borderRadius: 2,
                 bgcolor: 'background.paper',
                 boxShadow: 1,
-                maxWidth: 450,
+                maxWidth: 800,
                 margin: '0 auto',
             }}
         >
             <Typography variant="h6" gutterBottom>
                 Spending Breakdown
             </Typography>
-            <PieChart width={400} height={350}>
-                <Pie
-                    data={pieChartData}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
-                    label={renderCustomizedLabel}
-                    labelLine={true}
-                >
-                    {pieChartData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip formatter={value => `$${value.toFixed(2)}`} />
-                <Legend />
-            </PieChart>
+            <Box
+                sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    mt: 4,
+                    p: 2,
+                    maxWidth: 800,
+                    margin: '0 auto',
+                }}
+            >
+                {/* Pie Chart */}
+                <PieChart width={550} height={350}>
+                    <Pie
+                        data={pieChartData}
+                        cx="40%"
+                        cy="50%"
+                        outerRadius={100}
+                        fill="#8884d8"
+                        dataKey="value"
+                        label={renderCustomizedLabel}
+                        labelLine={true}
+                    >
+                        {pieChartData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                    </Pie>
+                    <Tooltip formatter={value => `$${value.toFixed(2)}`} />
+
+                    {/* Legend rendered separately */}
+                    <Legend
+                        verticalAlign="middle"
+                        align="right"
+                        layout="vertical"
+                        content={renderLegend}
+                    />
+                </PieChart>
+            </Box>
         </Box>
     )
 }

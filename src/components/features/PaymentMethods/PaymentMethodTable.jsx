@@ -16,7 +16,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import { useState } from 'react';
 
-export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpdate, onDelete, loading }) {
+export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpdate, onDelete }) {
     const [editId, setEditId] = useState(null)
     const [editFormData, setEditFormData] = useState({ name: '' })
     const [newMethodName, setNewMethodName] = useState('')
@@ -31,7 +31,8 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
     }
 
     const handleSave = async () => {
-        await onUpdate(editId, editFormData)
+        if (!editFormData.name.trim()) return;
+        await onUpdate(editId, { name: editFormData.name.trim() })
         setEditId(null)
         setEditFormData({ name: '' })
     }
@@ -76,10 +77,6 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
         return 0
     })
 
-    if (loading) {
-        return <Typography>Loading...</Typography>
-    }
-
     return (
         <>
             <Typography variant="h5" fontWeight="semiBold" mb={2}>
@@ -123,6 +120,10 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
                                         },
                                     }}
                                     fullWidth
+                                    autoComplete="off"
+                                    inputProps={{
+                                        autoComplete: 'off',
+                                    }}
                                 />
                             </TableCell>
                             <TableCell align="center" sx={{ width: '30%' }}>
@@ -173,6 +174,10 @@ export default function PaymentMethodTable({ methods, usedMethods, onAdd, onUpda
                                                     },
                                                 }}
                                                 fullWidth
+                                                autoComplete="off"
+                                                inputProps={{
+                                                    autoComplete: 'off',
+                                                }}
                                             />
                                         ) : (
                                             method.name

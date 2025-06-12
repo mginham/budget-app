@@ -38,6 +38,10 @@ export default function PurchaseForm({
                             onChange={handleChange}
                             required
                             size="medium"
+                            autoComplete="off"
+                            inputProps={{
+                                autoComplete: 'off',
+                            }}
                         />
                     </Grid>
 
@@ -51,6 +55,10 @@ export default function PurchaseForm({
                             onChange={handleChange}
                             required
                             size="medium"
+                            autoComplete="off"
+                            inputProps={{
+                                autoComplete: 'off',
+                            }}
                         />
                     </Grid>
                     <Grid size={6}>
@@ -100,6 +108,10 @@ export default function PurchaseForm({
                             onChange={handleChange}
                             InputLabelProps={{ shrink: true }}
                             size="medium"
+                            autoComplete="off"
+                            inputProps={{
+                                autoComplete: 'off',
+                            }}
                         />
                     </Grid>
 

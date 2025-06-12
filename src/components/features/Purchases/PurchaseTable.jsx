@@ -13,7 +13,7 @@ import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward'
 import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward'
 import EditableRow from "./EditableRow"
 import StaticRow from "./StaticRow"
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 
 export default function PurchaseTable({
     purchases,
@@ -47,32 +47,31 @@ export default function PurchaseTable({
                 return p.purchase?.toLowerCase() || ''
             case 'amount':
                 return p.amount || 0
-            case 'paymentMethod': {
-                const pm = paymentMethods.find(pm => pm.id === p.paymentMethod)
-                if (!pm) {
-                    // If not found, return empty string for consistent sorting
-                    console.warn(`Payment method not found for id: ${p.paymentMethod}`)
-                    return ''
-                }
-                return pm.name.toLowerCase()
-            }
-            case 'lineItem': {
-                const budgetItem = budgets.find(b => b.id === p.lineItem)
-                if (!budgetItem) {
-                    // If not found, return empty string for consistent sorting
-                    console.warn(`Budget line item not found for id: ${p.lineItem}`)
-                    return ''
-                }
-                return budgetItem.name.toLowerCase()
-            }
+            case 'paymentMethod':
+                return paymentMethods.find(pm => pm.id === p.paymentMethodId)?.name?.toLowerCase() || ''
+            case 'lineItem':
+                return budgets.find(b => b.id === p.lineItemId)?.name?.toLowerCase() || ''
             case 'timestamp':
-                return p.timestamp ? new Date(p.timestamp).getTime() : 0
+                return p.timestamp?.toMillis?.() ?? 0
             default:
                 return ''
         }
     }
 
-    const sortedPurchases = [...purchases].sort((a, b) => {
+    console.log("Budgets:", budgets);
+    console.log("Purchases:", purchases);
+
+    const enrichedPurchases = useMemo(() => {
+        return purchases.map(p => ({
+            ...p,
+            paymentMethodName: paymentMethods.find(pm => pm.id === p.paymentMethodId)?.name || '',
+            lineItemName: budgets.find(b => b.id === p.lineItemId)?.lineItem  || '',
+        }))
+    }, [purchases, paymentMethods, budgets])
+
+    console.log("Enriched purchases:", enrichedPurchases);
+
+    const sortedPurchases = [...enrichedPurchases].sort((a, b) => {
         const valA = getSortValue(a, sortColumn)
         const valB = getSortValue(b, sortColumn)
 
@@ -97,11 +96,9 @@ export default function PurchaseTable({
             <Stack direction="row" alignItems="center" justifyContent="center" spacing={0.5}>
                 <span>{children}</span>
                 {sortColumn === columnKey && (
-                    sortDirection === 'asc' ? (
-                        <ArrowUpwardIcon fontSize="small" />
-                    ) : (
-                        <ArrowDownwardIcon fontSize="small" />
-                    )
+                    sortDirection === 'asc'
+                    ? <ArrowUpwardIcon fontSize="small" />
+                    : <ArrowDownwardIcon fontSize="small" />
                 )}
             </Stack>
         </TableCell>
@@ -109,14 +106,14 @@ export default function PurchaseTable({
 
     return (
         <>
-            <Typography variant="h5" fontWeight="semiBold" mb={2}>
+            <Typography variant="h5" fontWeight="semiBold" mt={6} mb={2}>
                 Logged Purchases
             </Typography>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
                         <TableRow>
-                             <SortableHeaderCell columnKey="purchase">Purchase</SortableHeaderCell>
+                            <SortableHeaderCell columnKey="purchase">Purchase</SortableHeaderCell>
                             <SortableHeaderCell columnKey="amount">Amount ($)</SortableHeaderCell>
                             <SortableHeaderCell columnKey="paymentMethod">Payment Method</SortableHeaderCell>
                             <SortableHeaderCell columnKey="lineItem">Line Item</SortableHeaderCell>

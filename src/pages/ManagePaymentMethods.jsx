@@ -34,18 +34,21 @@ export default function ManagePaymentMethods() {
 
         const unsubscribePaymentMethods = subscribeToPaymentMethods(async (snapshot) => {
             const data = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-            setMethods(data)
-            setLoading(false)
 
             // Check which methods are used in purchases
-            const usedSet = new Set()
-            for (const method of data) {
-                const isUsed = await hasPurchasesForPaymentMethod(method.id)
-                if (isUsed) {
-                    usedSet.add(method.id)
-                }
-            }
+            const usageChecks = await Promise.all(
+                data.map(async (method) => {
+                    const isUsed = await hasPurchasesForPaymentMethod(method.id)
+                    return { id: method.id, isUsed }
+                })
+            )
+
+            const usedSet = new Set(usageChecks.filter(m => m.isUsed).map(m => m.id))
+
+            // Now update everything *together*
+            setMethods(data)
             setUsedMethods(usedSet)
+            setLoading(false)
         })
 
         return () => unsubscribePaymentMethods()
@@ -87,11 +90,10 @@ export default function ManagePaymentMethods() {
                             onAdd={handleAdd}
                             onUpdate={handleUpdate}
                             onDelete={handleDelete}
-                            loading={loading}
                         />
                     </>
                 )}
             </Container>
         </AppLayout>
-    );
+    )
 }

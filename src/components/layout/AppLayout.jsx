@@ -1,4 +1,4 @@
-import { Outlet, Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router-dom'
 import { useAuthStore } from '../../store/authStore'
 import {
     AppBar,
@@ -13,7 +13,7 @@ import {
 } from '../../components/mui'
 import MenuIcon from '@mui/icons-material/Menu'
 import LogoutIcon from '@mui/icons-material/Logout'
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 export default function AppLayout({ title, children }) {
     const { user, logout } = useAuthStore()

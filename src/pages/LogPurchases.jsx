@@ -2,7 +2,6 @@ import { useState, useEffect } from "react"
 import { db } from "../firebase"
 import {
     collection,
-    getDocs,
     addDoc,
     doc,
     updateDoc,
@@ -14,10 +13,8 @@ import { useAuthStore } from "../store/authStore"
 import { Link } from "react-router-dom"
 import {
     Alert,
-    Button,
     CircularProgress,
     Container,
-    Grid,
 } from '../components/mui';
 import PurchaseForm from "../components/features/Purchases/PurchaseForm"
 import PurchaseTable from "../components/features/Purchases/PurchaseTable"
@@ -47,37 +44,50 @@ export default function LogPurchases() {
     const [loading, setLoading] = useState(true)
 
 
-    // Fetch Firestore Data
+    // Helpers
+    const resetFormData = () =>
+        setFormData({
+            timestamp: "",
+            purchase: "",
+            amount: "",
+            lineItemId: "",
+            paymentMethodId: "",
+            paymentMethodName: "",
+        })
 
+
+    // Real-time listeners
     useEffect(() => {
         if (!userId) return
 
-        const fetchData = async () => {
-            await fetchBudgets()
-            await fetchPaymentMethods()
-            setLoading(false)
-        }
+        const unsubscribeBudgets = onSnapshot(
+            collection(db, "users", userId, "budgets"),
+            (snapshot) => {
+                const data = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                setBudgets(data)
+            }
+        )
 
-        fetchData()
+        const unsubscribePaymentMethods = onSnapshot(
+            collection(db, "users", userId, "paymentMethods"),
+            (snapshot) => {
+                const data = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }))
+                setPaymentMethods(data.sort((a, b) => a.name.localeCompare(b.name)))
+            }
+        )
+
+        return () => {
+            unsubscribeBudgets()
+            unsubscribePaymentMethods()
+        }
     }, [userId])
 
-    const fetchBudgets = async () => {
-        const snapshot = await getDocs(collection(db, "users", userId, "budgets"))
-        const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }))
-        setBudgets(data)
-    }
-
-    const fetchPaymentMethods = async () => {
-        const snapshot = await getDocs(collection(db, "users", userId, "paymentMethods"))
-        const data = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }))
-        setPaymentMethods(data.sort((a, b) => a.name.localeCompare(b.name))) // Sort options alphabetically
-    }
 
     // Real-time listener for purchases
     useEffect(() => {
@@ -90,20 +100,13 @@ export default function LogPurchases() {
                     .map(doc => ({ id: doc.id, ...doc.data() }))
                     .sort((a, b) => (b.timestamp?.seconds || 0) - (a.timestamp?.seconds || 0))
 
-                const purchasesWithLineItemNames = data.map(purchase => {
-                    const lineItem = budgets.find(b => b.id === purchase.lineItemId)
-                    return {
-                        ...purchase,
-                        lineItemName: lineItem ? lineItem.lineItem : '(Deleted)',
-                    }
-                })
-
-                setPurchases(purchasesWithLineItemNames);
+                setPurchases(data)
+                setLoading(false)
             }
         )
 
-        return () => unsubscribe();
-    }, [userId, budgets])
+        return () => unsubscribe()
+    }, [userId])
 
 
     // Form Handlers
@@ -135,8 +138,9 @@ export default function LogPurchases() {
         e.preventDefault()
 
         const { purchase, amount, lineItemId, paymentMethodId, paymentMethodName } = formData
+        const parsedAmount = parseFloat(amount)
 
-        if (!purchase || !amount || !lineItemId || !paymentMethodId) {
+        if (!purchase || !parsedAmount || parsedAmount <= 0 || !lineItemId || !paymentMethodId) {
             alert("Please fill in all required fields.")
             return
         }
@@ -147,7 +151,7 @@ export default function LogPurchases() {
 
         const newPurchase = {
             purchase,
-            amount: parseFloat(amount),
+            amount: parsedAmount,
             lineItemId,
             timestamp,
             paymentMethodId,
@@ -156,14 +160,7 @@ export default function LogPurchases() {
 
         try {
             await addDoc(collection(db, "users", userId, "purchases"), newPurchase)
-            setFormData({
-                timestamp: "",
-                purchase: "",
-                amount: "",
-                lineItemId: "",
-                paymentMethodId: "",
-                paymentMethodName: "",
-            })
+            resetFormData()
         } catch (err) {
             console.error("Error logging purchase:", err)
         }
@@ -175,10 +172,13 @@ export default function LogPurchases() {
     const handleStartEdit = (purchase) => {
         setEditingRowId(purchase.id)
         setEditingRowData({
-            ...purchase,
+            purchase: purchase.purchase,
+            amount: purchase.amount,
+            paymentMethodId: purchase.paymentMethodId || '',
+            lineItemId: purchase.lineItemId || '',
             timestamp: purchase.timestamp?.seconds
                 ? new Date(purchase.timestamp.seconds * 1000).toISOString().slice(0, 16)
-                : "",
+                : '',
         })
     }
 
@@ -221,7 +221,6 @@ export default function LogPurchases() {
     }
 
 
-    // UI Components
     return (
         <AppLayout title="Log Purchases">
             <Container maxWidth="md" disableGutters sx={{ py: 4 }}>
@@ -258,15 +257,6 @@ export default function LogPurchases() {
                             handleChange={handleChange}
                             handleSubmit={handleSubmit}
                         />
-
-                        {/* Payment Method Manager */}
-                        <Grid container justifyContent="right" alignItems="center" mb={3}>
-                            <Link to="/manage-payment-methods" style={{ textDecoration: 'none' }}>
-                                <Button variant="contained" color="link" sx={{ height: 50, fontWeight: "bold", color: '#FFFFFF' }}>
-                                    Manage Payment Methods
-                                </Button>
-                            </Link>
-                        </Grid>
 
                         {/* Logged Purchases Table */}
                         <PurchaseTable

@@ -10,13 +10,12 @@ import {
     Button,
     CircularProgress,
     Stack,
-    Typography,
 } from '../components/mui';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import AppLayout from '../components/layout/AppLayout';
-import BudgetTable from '../components/features/Dashboard/SpentBudgetTable';
+import SpentBudgetTable from '../components/features/Dashboard/SpentBudgetTable';
 import SpendingPieChart from '../components/features/Dashboard/SpendingPieChart'
 
 
@@ -128,7 +127,7 @@ export default function Dashboard() {
                 </>
             ) : (
                 <Stack spacing={6} mt={5}>
-                    <BudgetTable
+                    <SpentBudgetTable
                         budgets={budgets}
                         spendingByLineItem={spendingByLineItem}
                         selectedMonth={selectedMonth}
